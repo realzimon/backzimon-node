@@ -1,5 +1,5 @@
 var fs = require('fs');
-var obj = JSON.parse(fs.readFileSync('./quotes.json', 'utf8'));
+var obj = JSON.parse(fs.readFileSync('./config/quotes.json', 'utf8'));
 const db = require('monk')('127.0.0.1/zimon');
 const quotes = db.get('quotes');
 
