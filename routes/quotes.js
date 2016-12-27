@@ -8,11 +8,11 @@ var quotes = [
 ];
 
 /* GET home page. */
-router.get('/', function(req, res) {
+router.get('/', function (req, res) {
   res.json(quotes);
 });
 
-router.get('/random', function(req, res){
+router.get('/random', function (req, res) {
   res.json(quotes[Math.floor(Math.random() * quotes.length)])
 });
 

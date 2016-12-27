@@ -1,6 +1,6 @@
 {
-  "name": "zimon-2.0-server",
-  "version": "0.0.0",
+  "name": "backzimon-node",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "start": "node ./bin/www"
