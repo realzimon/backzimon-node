@@ -4,21 +4,21 @@ var router = express.Router();
 var models = require('../../models/index');
 
 router.get('/', function (req, res) {
-  models.Quote.find({}).then(function(response){
-    return res.json(response);
+  models.Zivi.find({}).then(function(response){
+    return res.json({
+      zivicount: response.length,
+      zivis: response
+    });
   });
 });
 
 router.get('/random', function (req, res) {
-
-  models.Quote.find({}).then(function(response){
-    return res.json({
-      quote: response[Math.floor(Math.random() * response.length)]
-    })
+  models.Zivi.find({}).then(function(response){
+    return res.json(response[Math.floor(Math.random() * response.length)])
   });
 });
 
-router.post('/', function(req, res){
+/*router.post('/', function(req, res){
   var text = req.body.text;
   if(!text){
     return res.status(400).json({
@@ -49,6 +49,6 @@ router.post('/', function(req, res){
     });
   });
 
-});
+});*/
 
 module.exports = router;

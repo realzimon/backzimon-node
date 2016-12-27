@@ -15,5 +15,21 @@ npm install -g nodemon # if you do not already have it
 node nodemon
 ```
 
+##Initialise the Database
+
+Connect to your mongoDB instance and create the database: zimon
+
+```
+use zimon
+```
+
+After you have created the db you can initialise the database with the following command:
+
+```
+npm run db:init
+```
+
+This will remove all previous entries of the database documents (zivis and quotes) and insert the values from the config files. 
+
 [travis-badge]: https://travis-ci.org/realzimon/backzimon-node.svg?branch=master
 [travis-badge-url]: https://travis-ci.org/realzimon/backzimon-node

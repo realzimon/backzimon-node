@@ -5,10 +5,8 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-//Reset Database
-require('./models/index');
-
 var quotes = require('./routes/v1/quotes');
+var zivis = require('./routes/v1/zivis');
 
 var app = express();
 
@@ -28,6 +26,7 @@ app.use(function (req, res, next) {
 });
 
 app.use('/api/v1/quotes', quotes);
+app.use('/api/v1/zivis', zivis);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
