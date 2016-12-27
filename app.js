@@ -5,7 +5,10 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var quotes = require('./routes/quotes');
+//Reset Database
+require('./config/dbinserts');
+
+var quotes = require('./routes/v1/quotes');
 
 var app = express();
 
@@ -24,7 +27,7 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.use('/api/v1/quote', quotes);
+app.use('/api/v1/quotes', quotes);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
