@@ -24,7 +24,7 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.use('/api/v1/quote/random', quotes);
+app.use('/api/v1/quote', quotes);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

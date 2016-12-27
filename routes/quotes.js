@@ -8,7 +8,7 @@ var quotes = [
 ];
 
 /* GET home page. */
-router.get('/', function (req, res) {
+router.get('/all', function (req, res) {
   res.json(quotes);
 });
 
