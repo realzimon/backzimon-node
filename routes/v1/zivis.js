@@ -1,10 +1,12 @@
 var express = require('express');
+var shuffle = require('shuffle-array');
 var router = express.Router();
 
 var models = require('../../models/index');
 
 router.get('/', function (req, res) {
   models.Zivi.find({}).then(function(response){
+    shuffle(response);
     return res.json({
       zivicount: response.length,
       zivis: response
