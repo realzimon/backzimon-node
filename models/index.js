@@ -22,7 +22,8 @@ var Zivi = mongoose.model('zivi', mongoose.Schema({
   post_count: {
     type: Number,
     min: 0
-  }
+  },
+  color: String
 }));
 
 var models = {

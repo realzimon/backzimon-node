@@ -2,26 +2,31 @@
   {
     "name": "Dominik",
     "name_mx": "Chefzimone el Senioré, i.A. original Chefzimon",
-    "post_count": 0
+    "post_count": 0,
+    "color": "light-blue"
   },
   {
     "name": "Philipp",
     "name_mx": "",
-    "post_count": 0
+    "post_count": 0,
+    "color": "teal"
   },
   {
     "name": "Thomas",
     "name_mx": "",
-    "post_count": 0
+    "post_count": 0,
+    "color": "red"
   },
   {
     "name": "Peter",
     "name_mx": "",
-    "post_count": 0
+    "post_count": 0,
+    "color": "lime"
   },
   {
     "name": "Daniel",
     "name_mx": "",
-    "post_count": 0
+    "post_count": 0,
+    "color": "pink"
   }
 ]
