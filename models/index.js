@@ -23,7 +23,8 @@ var Zivi = mongoose.model('zivi', mongoose.Schema({
     type: Number,
     min: 0
   },
-  color: String
+  color: String,
+  picture: String
 }));
 
 var models = {

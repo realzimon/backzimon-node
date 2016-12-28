@@ -25,7 +25,8 @@ models.Zivi.remove({}, function(){
       name: el.name,
       name_mx: el.name_mx,
       post_count: el.post_count,
-      color: el.color
+      color: el.color,
+      picture: el.picture
     });
     zivi.save(function (err, res) {
       console.log('Inserted: ', res);
