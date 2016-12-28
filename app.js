@@ -7,6 +7,8 @@ var bodyParser = require('body-parser');
 
 var quotes = require('./routes/v1/quotes');
 var zivis = require('./routes/v1/zivis');
+//Timer of the socket io
+require('./routes/v1/timer');
 
 var app = express();
 
