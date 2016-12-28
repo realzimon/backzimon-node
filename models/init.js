@@ -24,9 +24,11 @@ models.Zivi.remove({}, function(){
     var zivi = new models.Zivi({
       name: el.name,
       name_mx: el.name_mx,
-      post_count: el.post_count,
+      post_count: 0,
       color: el.color,
-      picture: el.picture
+      picture: el.picture,
+      first: 0,
+      order: 0
     });
     zivi.save(function (err, res) {
       console.log('Inserted: ', res);

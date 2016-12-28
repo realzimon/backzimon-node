@@ -2,35 +2,30 @@
   {
     "name": "Dominik",
     "name_mx": "Chefzimone el Senioré, i.A. original Chefzimon",
-    "post_count": 0,
     "color": "light-blue",
     "picture": "zivis/dominik.jpg"
   },
   {
     "name": "Philipp",
     "name_mx": "El Philippo",
-    "post_count": 0,
     "color": "teal",
     "picture": "zivis/philipp.jpg"
   },
   {
     "name": "Thomas",
     "name_mx": "El Toms",
-    "post_count": 0,
     "color": "red",
     "picture": "zivis/thomas.jpg"
   },
   {
     "name": "Peter",
     "name_mx": "El Pedro",
-    "post_count": 0,
-    "color": "lime",
+    "color": "orange",
     "picture": "zivis/peter.jpg"
   },
   {
     "name": "Daniel",
     "name_mx": "El Daniela",
-    "post_count": 0,
     "color": "pink",
     "picture": "zivis/daniel.jpg"
   }
