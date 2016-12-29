@@ -1,6 +1,6 @@
 const STATES = {
   IDLE: 'Idle',
-  PREPERATION: 'Preperation',
+  PREPERATION: 'Preparation',
   ACTION: 'Action',
   REMINDER: 'Reminder'
 };

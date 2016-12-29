@@ -1,4 +1,5 @@
 var fs = require('fs');
+const STATES = require('../config/states');
 var models = require('../models/index');
 var quotes = JSON.parse(fs.readFileSync('./config/quotes.json', 'utf8'));
 var zivis = JSON.parse(fs.readFileSync('./config/zivis.json', 'utf8'));
@@ -40,7 +41,7 @@ models.Zivi.remove({}, function(){
 models.Post.remove({}, function(){
   console.log('Removed previos post state');
   var post = new models.Post({
-    state: 'IDLE',
+    state: STATES.IDLE,
     timestamp: new Date(),
     post: null
   });
