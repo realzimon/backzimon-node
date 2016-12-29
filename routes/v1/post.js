@@ -41,7 +41,11 @@ router.put('/', function(req, res){
             err: 'Zivi cant be changed as the state is not PREPARING'
           });
         }
-        models.Zivi.find({}).then(function(zivis){
+        models.Zivi.find({
+          name: {
+            $ne: post.zivi ? post.zivi.name : ''
+          }
+        }).then(function(zivis){
           shuffle(zivis);
           post.zivi = zivis[0];
           post.save(function(err){

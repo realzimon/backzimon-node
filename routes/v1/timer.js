@@ -14,7 +14,7 @@ shuffleAndUpdateZivis();
 
 //Set the timeout on the first start and then every day after (86400000)
 setPostInterval();
-setInterval(setPostInterval, 20000);
+setInterval(setPostInterval, 30000);
 var lastPostZivi;
 
 function countDown() {
@@ -89,8 +89,8 @@ function setPostInterval(){
   //TODO: Remove
   setTimeout(changeStateToPrep, test);
   //5 seconds later
-  setTimeout(changeStateToReminder, test + 5000);
-  setTimeout(changeStateToIdle, test + 10000);
+  setTimeout(changeStateToReminder, test + 10000);
+  setTimeout(changeStateToIdle, test + 20000);
 
 }
 
@@ -101,7 +101,11 @@ function changeStateToPrep(){
     /*if(post.state !== 'IDLE'){
       return console.log('Somebody missed the accept the post offer');
     }*/
-    models.Zivi.find({}).then(function(zivis){
+    models.Zivi.find({
+      name: {
+        $ne: post.zivi ? post.zivi.name : ''
+      }
+    }).then(function(zivis){
       shuffle(zivis);
       var chosenOne = zivis[0];
 
@@ -153,7 +157,6 @@ function changeStateToIdle(){
     }
     post.state = STATES.IDLE;
     post.timestamp = new Date();
-    post.zivi = null;
     post.save(function(err){
       if(err){
         return console.log('Something went wrong on post update', err);
