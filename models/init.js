@@ -43,7 +43,7 @@ models.Post.remove({}, function(){
   var post = new models.Post({
     state: STATES.IDLE,
     timestamp: new Date(),
-    post: null
+    zivi: null
   });
   post.save(function (err, res) {
     console.log('Inserted: ', res);
