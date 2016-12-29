@@ -25,11 +25,6 @@ router.put('/', function (req, res) {
       err: 'No action given'
     });
   }
-  if (action !== 'accepted' && action !== 'cancel' && action !== 'next') {
-    return res.status(400).json({
-      err: 'Illegal action'
-    });
-  }
 
   console.log(action);
 
@@ -110,7 +105,12 @@ router.put('/', function (req, res) {
             }
           });
         }
-      })
+      });
+      break;
+    default:
+      return res.status(400).json({
+        err: 'Illegal action'
+      });
   }
 
 });
