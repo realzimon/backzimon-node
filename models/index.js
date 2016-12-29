@@ -30,9 +30,16 @@ var Zivi = mongoose.model('zivi', mongoose.Schema({
   order: 0
 }));
 
+var Post = mongoose.model('post', mongoose.Schema({
+  state: String,
+  timestamp: Date,
+  zivi: Object
+}));
+
 var models = {
   Quote: Quote,
-  Zivi: Zivi
+  Zivi: Zivi,
+  Post: Post
 };
 
 module.exports = models;

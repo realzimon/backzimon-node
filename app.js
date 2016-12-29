@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 
 var quotes = require('./routes/v1/quotes');
 var zivis = require('./routes/v1/zivis');
+var post = require('./routes/v1/post');
 //Timer of the socket io
 require('./routes/v1/timer');
 
@@ -29,6 +30,7 @@ app.use(function (req, res, next) {
 
 app.use('/api/v1/quotes', quotes);
 app.use('/api/v1/zivis', zivis);
+app.use('/api/v1/post', post);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

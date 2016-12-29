@@ -36,3 +36,15 @@ models.Zivi.remove({}, function(){
     });
   });
 });
+
+models.Post.remove({}, function(){
+  console.log('Removed previos post state');
+  var post = new models.Post({
+    state: 'IDLE',
+    timestamp: new Date(),
+    post: null
+  });
+  post.save(function (err, res) {
+    console.log('Inserted: ', res);
+  })
+});
