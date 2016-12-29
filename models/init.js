@@ -26,6 +26,7 @@ models.Zivi.remove({}, function(){
       name_mx: el.name_mx,
       post_count: 0,
       color: el.color,
+      colorHex: el.colorHex,
       picture: el.picture,
       first: 0,
       order: 0

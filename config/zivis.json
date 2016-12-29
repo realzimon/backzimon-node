@@ -3,30 +3,35 @@
     "name": "Dominik",
     "name_mx": "El Chefzivi originál",
     "color": "light-blue",
+    "colorHex": "#03a9f4",
     "picture": "zivis/dominik.jpg"
   },
   {
     "name": "Philipp",
     "name_mx": "El Philippo",
     "color": "teal",
+    "colorHex": "#009688",
     "picture": "zivis/philipp.jpg"
   },
   {
     "name": "Thomas",
     "name_mx": "El Thomasín",
     "color": "red",
+    "colorHex": "#f44336",
     "picture": "zivis/thomas.jpg"
   },
   {
     "name": "Peter",
     "name_mx": "El Pedro",
     "color": "orange",
+    "colorHex": "#ff9800",
     "picture": "zivis/peter.jpg"
   },
   {
     "name": "Daniel",
     "name_mx": "El Señor BSc",
     "color": "pink",
+    "colorHex": "#e91e63",
     "picture": "zivis/daniel.jpg"
   }
 ]
