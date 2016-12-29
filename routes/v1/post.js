@@ -6,7 +6,7 @@ const STATES = require('../../config/states');
 var models = require('../../models/index');
 
 router.get('/', function (req, res) {
-  models.Post.findOne({}).then(function(response){
+  models.Post.findOne({}).then(function (response) {
     return res.json(response);
   });
 });
@@ -18,14 +18,14 @@ router.get('/', function (req, res) {
  * cancel: there is no post for today
  * accepted: zimon made an offer that cant be refused and the zivi has accepted it
  */
-router.put('/', function(req, res){
+router.put('/', function (req, res) {
   var action = req.body.action;
-  if(!action){
+  if (!action) {
     return res.status(400).json({
       err: 'No action given'
     });
   }
-  if(action !== 'accepted' && action !== 'cancel' && action !== 'next'){
+  if (action !== 'accepted' && action !== 'cancel' && action !== 'next') {
     return res.status(400).json({
       err: 'Illegal action'
     });
@@ -33,10 +33,10 @@ router.put('/', function(req, res){
 
   console.log(action);
 
-  switch(action){
+  switch (action) {
     case 'next':
-      models.Post.findOne({}).then(function(post){
-        if(post.state !== STATES.PREPERATION){
+      models.Post.findOne({}).then(function (post) {
+        if (post.state !== STATES.PREPERATION) {
           return res.status(400).json({
             err: 'Zivi cant be changed as the state is not PREPARING'
           });
@@ -48,8 +48,8 @@ router.put('/', function(req, res){
         }).then(function(zivis){
           shuffle(zivis);
           post.zivi = zivis[0];
-          post.save(function(err){
-            if(err){
+          post.save(function (err) {
+            if (err) {
               return res.status(500).json({
                 err: 'Something went wrong on changing the zivi'
               })
@@ -60,7 +60,7 @@ router.put('/', function(req, res){
       });
       break;
     case 'accepted':
-      models.Post.findOne({}).then(function(post) {
+      models.Post.findOne({}).then(function (post) {
         if (post.state !== STATES.PREPERATION) {
           return res.status(400).json({
             err: 'Zivi cant accept as the state is not PREPARING'
@@ -73,10 +73,10 @@ router.put('/', function(req, res){
               err: 'Something went wrong on changing the zivi'
             })
           }
-          models.Zivi.findOne({name: post.zivi.name}).then(function(zivi){
+          models.Zivi.findOne({name: post.zivi.name}).then(function (zivi) {
             zivi.post_count += zivi.post_count + 1;
             zivi.save(function (err) {
-              if(err){
+              if (err) {
                 return res.status(500).json({
                   err: 'Something went wrong on updating the user post'
                 });
@@ -88,14 +88,34 @@ router.put('/', function(req, res){
         })
       });
       break;
-      //TODO: Implement cancel
+    //TODO: Implement cancel
     case 'cancel':
       break;
+    case 'dismiss-reminder':
+      models.Post.findOne({}).then(function (post) {
+        if (post.state !== STATES.REMINDER) {
+          return res.status(400).json({
+            err: 'Cannot dismiss reminder when not in reminder state (is: ' + post.state + ')'
+          });
+        } else {
+          post.state = STATES.IDLE;
+          post.timestamp = new Date();
+          post.save(function (err) {
+            if (err) {
+              return res.status(500).json({
+                err: 'database error while attempting to save state'
+              });
+            } else {
+              return res.json();
+            }
+          });
+        }
+      })
   }
 
 });
 
-router.post('/', function(req, res){
+router.post('/', function (req, res) {
   return res.json(null);
 });
 
