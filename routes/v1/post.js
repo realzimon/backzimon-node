@@ -31,6 +31,8 @@ router.put('/', function(req, res){
     });
   }
 
+  console.log(action);
+
   switch(action){
     case 'next':
       models.Post.findOne({}).then(function(post){
@@ -57,7 +59,7 @@ router.put('/', function(req, res){
       models.Post.findOne({}).then(function(post) {
         if (post.state !== STATES.PREPERATION) {
           return res.status(400).json({
-            err: 'Zivi cant be changed as the state is not PREPARING'
+            err: 'Zivi cant accept as the state is not PREPARING'
           });
         }
         post.state = STATES.ACTION;

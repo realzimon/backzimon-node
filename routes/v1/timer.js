@@ -15,6 +15,7 @@ shuffleAndUpdateZivis();
 //Set the timeout on the first start and then every day after (86400000)
 setPostInterval();
 setInterval(setPostInterval, 20000);
+var lastPostZivi;
 
 function countDown() {
   remaining--;
@@ -39,7 +40,13 @@ function shuffleAndUpdateZivis(){
 }
 
 function setPostInterval(){
+
   var now = new Date();
+  //dont do anything on the weekends
+  if(now.getDay() == 6 || now.getDay() == 0){
+    return;
+  }
+
   var millisTill10 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 10, 0, 0, 0) - now;
   var millisTill14 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 14, 0, 0, 0) - now;
   var millisTill1115 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 11, 15, 0, 0) - now;
