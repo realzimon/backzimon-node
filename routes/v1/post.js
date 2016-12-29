@@ -69,7 +69,7 @@ router.put('/', function (req, res) {
             })
           }
           models.Zivi.findOne({name: post.zivi.name}).then(function (zivi) {
-            zivi.post_count += zivi.post_count + 1;
+            zivi.post_count += 1;
             zivi.save(function (err) {
               if (err) {
                 return res.status(500).json({

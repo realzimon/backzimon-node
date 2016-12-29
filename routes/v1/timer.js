@@ -131,7 +131,7 @@ function changeStateToReminder(){
     }
     //User has accepted the request and is now back (probably) or forgot to accept the offer
     models.Zivi.findOne({name: post.zivi.name}).then(function(zivi){
-      zivi.post_count += zivi.post_count + 1;
+      zivi.post_count += 1;
       zivi.save(function(err){
         if(err){
           return console.log('Something went wrong on user update', err);
