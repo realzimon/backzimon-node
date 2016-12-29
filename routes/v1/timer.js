@@ -69,10 +69,6 @@ function setPostInterval(){
   if(millisTill1530 < 0){
     millisTill1530 = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 15, 30, 0, 0) - now;
   }
-  //TODO: Remove
-  if(test < 0 ){
-    test = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, now.getHours(), now.getMinutes(), now.getSeconds() + 5, 0) - now;
-  }
 
   setTimeout(changeStateToPrep, millisTill10);
   setTimeout(changeStateToPrep, millisTill14);

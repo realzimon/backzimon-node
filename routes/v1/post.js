@@ -13,10 +13,10 @@ router.get('/', function (req, res) {
 
 /**
  * Changes the state on the server, the valid options are:
- * n (next): the chosen one, does not accept the offer, or is not available today, so the next
+ * next: the chosen one, does not accept the offer, or is not available today, so the next
  * person will be chosen (randomly)
- * c (cancel): there is no post for today
- * a (accepted): zimon made an offer that cant be refused and the zivi has accepted it
+ * cancel: there is no post for today
+ * accepted: zimon made an offer that cant be refused and the zivi has accepted it
  */
 router.put('/', function(req, res){
   var action = req.body.action;
@@ -25,14 +25,14 @@ router.put('/', function(req, res){
       err: 'No action given'
     });
   }
-  if(action !== 'n' && action !== 'c' && action !== 'a'){
+  if(action !== 'accepted' && action !== 'cancel' && action !== 'next'){
     return res.status(400).json({
       err: 'Illegal action'
     });
   }
 
   switch(action){
-    case 'n':
+    case 'next':
       models.Post.findOne({}).then(function(post){
         if(post.state !== STATES.PREPERATION){
           return res.status(400).json({
@@ -53,7 +53,7 @@ router.put('/', function(req, res){
         });
       });
       break;
-    case 'a':
+    case 'accepted':
       models.Post.findOne({}).then(function(post) {
         if (post.state !== STATES.PREPERATION) {
           return res.status(400).json({
@@ -83,7 +83,7 @@ router.put('/', function(req, res){
       });
       break;
       //TODO: Implement cancel
-    case 'c':
+    case 'cancel':
       break;
   }
 
