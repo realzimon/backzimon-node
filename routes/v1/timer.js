@@ -58,8 +58,6 @@ function setPostInterval() {
   setTimeout(changeStateToPrep, millisUntilTime(14, 45));
   setTimeout(changeStateToReminder, millisUntilTime(11, 10));
   setTimeout(changeStateToReminder, millisUntilTime(15, 10));
-  setTimeout(changeStateToIdle, millisUntilTime(11, 30));
-  setTimeout(changeStateToIdle, millisUntilTime(15, 30));
 }
 
 function changeStateToPrep() {
