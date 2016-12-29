@@ -60,6 +60,18 @@ function setPostInterval() {
   setTimeout(changeStateToReminder, millisUntilTime(15, 10));
 }
 
+function setStateSaveAndUpdate(post, state) {
+  post.state = state;
+  post.timestamp = new Date();
+  post.save(function (err) {
+    if (err) {
+      console.log('Error saving post state: ', err);
+    } else {
+      sendPostUpdate();
+    }
+  })
+}
+
 function changeStateToPrep() {
   models.Post.findOne({}).then(function (post) {
     //This should not happen, if everybody watches their shit
@@ -73,19 +85,8 @@ function changeStateToPrep() {
       }
     }).then(function (zivis) {
       shuffle(zivis);
-      var chosenOne = zivis[0];
-
-      post.state = STATES.PREPERATION;
-      post.timestamp = new Date();
-      post.zivi = chosenOne;
-
-      post.save(function (err, result) {
-        if (err) {
-          return console.log('Something wrent wrong:', err);
-        }
-        sendPostUpdate();
-      });
-
+      post.zivi = zivis[0];
+      setStateSaveAndUpdate(post, STATES.PREPERATION);
     });
   });
 }
@@ -102,33 +103,10 @@ function changeStateToReminder() {
         if (err) {
           return console.log('Something went wrong on user update', err);
         }
-        post.state = STATES.REMINDER;
-        post.timestamp = new Date();
-        post.save(function (err) {
-          if (err) {
-            return console.log('Something went wrong on post update', err);
-          }
-          sendPostUpdate();
-        });
+        setStateSaveAndUpdate(post, STATES.REMINDER);
       });
     });
 
-  });
-}
-
-function changeStateToIdle() {
-  models.Post.findOne({}).then(function (post) {
-    if (post.state !== STATES.REMINDER) {
-      return console.log('Something went terribly wrong');
-    }
-    post.state = STATES.IDLE;
-    post.timestamp = new Date();
-    post.save(function (err) {
-      if (err) {
-        return console.log('Something went wrong on post update', err);
-      }
-      sendPostUpdate();
-    });
   });
 }
 
