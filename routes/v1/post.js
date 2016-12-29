@@ -4,25 +4,24 @@ var shuffle = require('shuffle-array');
 
 const STATES = require('../../config/states');
 var models = require('../../models/index');
+var PostService = require('../../services/post.service.js');
 
 router.get('/', function (req, res) {
-  models.Post.findOne({}).then(function (response) {
+  PostService.findCurrentState(function (response) {
     return res.json(response);
   });
 });
 
-function setAndSavePostState(post, state, res) {
-  post.state = state;
-  post.timestamp = new Date();
-  post.save(function (err) {
+function orRespond(res, status, message) {
+  return function (err) {
     if (err) {
-      return res.status(500).json({
-        err: 'database error while attempting to save state'
+      return res.status(status).json({
+        err: message ? message : err
       });
     } else {
       return res.json();
     }
-  });
+  };
 }
 
 /**
@@ -44,67 +43,16 @@ router.put('/', function (req, res) {
 
   switch (action) {
     case 'next':
-      models.Post.findOne({}).then(function (post) {
-        if (post.state !== STATES.PREPERATION) {
-          return res.status(400).json({
-            err: 'Zivi cant be changed as the state is not PREPARING'
-          });
-        }
-        models.Zivi.find({
-          name: {
-            $ne: post.zivi ? post.zivi.name : ''
-          }
-        }).then(function (zivis) {
-          shuffle(zivis);
-          post.zivi = zivis[0];
-          post.save(function (err) {
-            if (err) {
-              return res.status(500).json({
-                err: 'Something went wrong on changing the zivi'
-              })
-            }
-            return res.json();
-          })
-        });
-      });
+      PostService.nextZivi(orRespond(res, 500));
       break;
     case 'accepted':
-      models.Post.findOne({}).then(function (post) {
-        if (post.state !== STATES.PREPERATION) {
-          return res.status(400).json({
-            err: 'Can only accept in preparation state, is: ' + post.state
-          });
-        }
-        setAndSavePostState(post, STATES.ACTION, res);
-        models.Zivi.findOne({name: post.zivi.name}).then(function (zivi) {
-          zivi.post_count += 1;
-          zivi.save(function (err) {
-            if (err) {
-              return res.status(500).json({
-                err: 'Database error trying to credit post to Zivi ' + zivi.name
-              });
-            } else {
-              return res.json();
-            }
-          });
-        });
-      });
+      PostService.acceptPost(orRespond(res, 500));
       break;
     case 'cancel':
-      models.Post.findOne({}).then(function (post) {
-        setAndSavePostState(post, STATES.IDLE, res);
-      });
+      PostService.justSetState(STATES.IDLE, orRespond(res, 500));
       break;
     case 'dismiss-reminder':
-      models.Post.findOne({}).then(function (post) {
-        if (post.state !== STATES.REMINDER) {
-          return res.status(400).json({
-            err: 'Cannot dismiss reminder when not in reminder state (is: ' + post.state + ')'
-          });
-        } else {
-          setAndSavePostState(post, STATES.IDLE, res);
-        }
-      });
+      PostService.dismissReminder(orRespond(res, 500));
       break;
     default:
       return res.status(400).json({
