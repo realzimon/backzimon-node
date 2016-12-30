@@ -3,7 +3,7 @@ var models = require('../models/index');
 
 var ZiviService = {};
 
-ZiviService.getByName = function (name, callback) {
+ZiviService.findOneByName = function (name, callback) {
   models.Zivi.findOne({name: post.zivi.name}).then(function (zivi) {
     callback(zivi);
   });

@@ -8,8 +8,8 @@ var bodyParser = require('body-parser');
 var quotes = require('./routes/v1/quotes');
 var zivis = require('./routes/v1/zivis');
 var post = require('./routes/v1/post');
-//Timer of the socket io
-require('./routes/v1/timer');
+require('./timers/zivi.timer.js');
+require('./timers/post.timer.js');
 
 var app = express();
 

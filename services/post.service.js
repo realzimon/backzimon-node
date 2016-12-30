@@ -61,7 +61,7 @@ PostService.incrementPostCount = function (post, callback) {
   if (!post.zivi) {
     return;
   }
-  ZiviService.getByName(post.zivi.name, function (zivi) {
+  ZiviService.findOneByName(post.zivi.name, function (zivi) {
     zivi.post_count += 1;
     zivi.save(callback);
   });
@@ -70,7 +70,7 @@ PostService.incrementPostCount = function (post, callback) {
 PostService.dismissReminder = function (callback) {
   PostService.findCurrentState(function (post) {
     if (post.state !== STATES.REMINDER) {
-      return callback('Cannot dismiss reminder when not in reminder state, is: ' + post.state);
+      return callback && callback('Cannot dismiss reminder when not in reminder state, is: ' + post.state);
     } else {
       PostService.setStateOn(post, STATES.IDLE, callback);
     }
@@ -80,20 +80,35 @@ PostService.dismissReminder = function (callback) {
 PostService.nextZivi = function (callback) {
   PostService.findCurrentState(function (post) {
     if (post.state !== STATES.PREPERATION) {
-      return callback('Expected preparation state, but is: ' + post.state);
+      return callback && callback('Expected preparation state, but is: ' + post.state);
     }
-    PostService.selectPostlerFairly(post, function (selectedZivi) {
-      post.zivi = selectedZivi;
-      PostService.attemptSave(post, callback);
-    });
+    PostService.selectPostlerFairly(post, callback);
   });
 };
 
 PostService.selectPostlerFairly = function (post, callback) {
   ZiviService.findAllBut(post.zivi, function (zivis) {
     shuffle(zivis);
-    callback(zivis[0]);
-  })
+    post.zivi = zivis[0];
+    PostService.attemptSave(post, callback);
+  });
+};
+
+PostService.startReminderState = function (callback) {
+  PostService.findCurrentState(function (post) {
+    if (post.state !== STATES.ACTION && post.state !== STATES.PREPERATION) {
+      return callback && callback('Invalid state, is: ' + post.state);
+    } else {
+      PostService.setStateOn(post, STATES.REMINDER, callback);
+    }
+  });
+};
+
+PostService.startPreparationState = function (callback) {
+  PostService.findCurrentState(function (post) {
+    post.state = STATES.PREPERATION;
+    PostService.selectPostlerFairly(post, callback);
+  });
 };
 
 return PostService;
