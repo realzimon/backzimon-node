@@ -71,7 +71,7 @@ function checkReminderState(post) {
 }
 
 function shouldPreparePost(post) {
-  return timeIsAfterButLastActionIsBefore(post, 10, 45) ||
+  return timeIsAfterButLastActionIsBefore(post, 9, 0) ||
     timeIsAfterButLastActionIsBefore(post, 14, 45);
 }
 
@@ -106,5 +106,9 @@ PostTimer.pushPostState = function () {
     update: 'state'
   });
 };
+
+
+const TEN_SECONDS = 10 * 1000;
+setInterval(PostTimer.checkAndNotify, TEN_SECONDS);
 
 module.exports = PostTimer;
