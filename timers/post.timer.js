@@ -27,7 +27,7 @@ PostTimer.checkAndNotify = function () {
       default:
         console.error(' ## unknown post state: ', post.state);
     }
-  })
+  });
 };
 
 function isWeekend(date) {
@@ -100,5 +100,6 @@ function isBeforeHM(date, hour, minute) {
 
 const TEN_SECONDS = 10 * 1000;
 setInterval(PostTimer.checkAndNotify, TEN_SECONDS);
+PostService.pushPostState();
 
 module.exports = PostTimer;
