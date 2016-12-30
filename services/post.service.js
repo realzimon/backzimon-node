@@ -94,8 +94,28 @@ PostService.nextZivi = function (callback) {
 
 PostService.selectPostlerFairly = function (post, callback) {
   ZiviService.findAllBut(post.zivi, function (zivis) {
-    shuffle(zivis);
-    post.zivi = zivis[0];
+    var fairArray = [];
+    //Determine max post count of the zivis
+    var maxPostCount = -1;
+    zivis.forEach(function(zivi){
+      if(zivi.post_count > maxPostCount){
+        maxPostCount = zivi.post_count;
+      }
+    });
+    /*
+      Create an array that has maxPostCount - zivi.post_count + 1 elements
+      of each zivi. Which will basically represent a zivi with a lower post count
+      in a higher probability than a zivi with a higher post count
+      e.g: zivi1.post_count: 3, zivi2.post_count: 1, zivi3.post_count: 2
+      fairArray = [zivi1, zivi2, zivi2, zivi2, zivi3, zivi3]
+     */
+    zivis.forEach(function(zivi){
+      for(var i = 0; i < maxPostCount - zivi.post_count + 1; i++){
+        fairArray.push(zivi);
+      }
+    });
+    shuffle(fairArray);
+    post.zivi = fairArray[0];
     PostService.attemptSave(post, callback);
   });
 };
