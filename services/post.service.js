@@ -3,6 +3,7 @@ var shuffle = require('shuffle-array');
 const STATES = require('../config/states');
 var models = require('../models/index');
 var ZiviService = require('./zivi.service');
+var SocketService = require('./socket.service');
 
 var PostService = {};
 
@@ -23,7 +24,12 @@ PostService.attemptSave = function (post, callback) {
 PostService.setStateOn = function (post, state, callback) {
   post.state = state;
   post.timestamp = new Date();
-  PostService.attemptSave(post, callback);
+  PostService.attemptSave(post, function (err) {
+    callback && callback(err);
+    if(!err) {
+      PostService.pushPostState();
+    }
+  });
 };
 
 PostService.setStateOnOrLog = function (post, state) {
@@ -110,6 +116,12 @@ PostService.startPreparationState = function (callback) {
   PostService.findCurrentState(function (post) {
     post.state = STATES.PREPERATION;
     PostService.selectPostlerFairly(post, callback);
+  });
+};
+
+PostService.pushPostState = function () {
+  SocketService.writeToSocket('post', {
+    update: 'state'
   });
 };
 

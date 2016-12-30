@@ -2,7 +2,6 @@ var shuffle = require('shuffle-array');
 const STATES = require('../config/states');
 var models = require('../models/index');
 var PostService = require('./../services/post.service.js');
-var SocketService = require('./../services/socket.service');
 
 var PostTimer = {};
 
@@ -41,8 +40,6 @@ function pushStateOrLog(prefix) {
   return function (err) {
     if (err) {
       console.error(' ## postchecker.service | ', prefix ? prefix : 'error', ' : ', err);
-    } else {
-      PostTimer.pushPostState();
     }
   }
 }
@@ -71,7 +68,7 @@ function checkReminderState(post) {
 }
 
 function shouldPreparePost(post) {
-  return timeIsAfterButLastActionIsBefore(post, 9, 0) ||
+  return timeIsAfterButLastActionIsBefore(post, 10, 45) ||
     timeIsAfterButLastActionIsBefore(post, 14, 45);
 }
 
@@ -100,13 +97,6 @@ function lastActionBeforeHM(post, hour, minute) {
 function isBeforeHM(date, hour, minute) {
   return date.getHours() <= hour && date.getMinutes() < minute;
 }
-
-PostTimer.pushPostState = function () {
-  SocketService.writeToSocket('post', {
-    update: 'state'
-  });
-};
-
 
 const TEN_SECONDS = 10 * 1000;
 setInterval(PostTimer.checkAndNotify, TEN_SECONDS);
