@@ -72,7 +72,7 @@ function shouldPreparePost(post) {
     timeIsAfterButLastActionIsBefore(post, 14, 45);
 }
 
-const A_MINUTE_IN_MILLIS = 160 * 1000;
+const A_MINUTE_IN_MILLIS = 60 * 1000;
 function lastActionMoreThanMinutesAgo(post, minutes) {
   var now = new Date();
   return (now - post.timestamp) > (minutes * A_MINUTE_IN_MILLIS);
