@@ -69,7 +69,7 @@ function checkReminderState(post) {
 
 function shouldPreparePost(post) {
   return timeIsAfterButLastActionIsBefore(post, 10, 45) ||
-    timeIsAfterButLastActionIsBefore(post, 14, 45);
+    timeIsAfterButLastActionIsBefore(post, 15, 13);
 }
 
 const A_MINUTE_IN_MILLIS = 60 * 1000;
@@ -87,7 +87,7 @@ function timeIsAfterHM(hour, minute) {
 }
 
 function isAfterHM(date, hour, minute) {
-  return date.getHours() > hour || (date.getHours() == hour && date.getMinutes() > minute);
+  return date.getHours() > hour || (date.getHours() == hour && date.getMinutes() >= minute);
 }
 
 function lastActionBeforeHM(post, hour, minute) {
@@ -95,7 +95,7 @@ function lastActionBeforeHM(post, hour, minute) {
 }
 
 function isBeforeHM(date, hour, minute) {
-  return date.getHours() < hour || (date.getHours() == hour && date.getMinutes() < minute);
+  return date.getHours() < hour || (date.getHours() == hour && date.getMinutes() <= minute);
 }
 
 const TEN_SECONDS = 10 * 1000;
