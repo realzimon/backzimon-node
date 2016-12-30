@@ -18,18 +18,16 @@ PostService.attemptSave = function (post, callback) {
     if (callback) {
       callback(err);
     }
+    if(!err) {
+      PostService.pushPostState();
+    }
   });
 };
 
 PostService.setStateOn = function (post, state, callback) {
   post.state = state;
   post.timestamp = new Date();
-  PostService.attemptSave(post, function (err) {
-    callback && callback(err);
-    if(!err) {
-      PostService.pushPostState();
-    }
-  });
+  PostService.attemptSave(post, callback);
 };
 
 PostService.setStateOnOrLog = function (post, state) {
