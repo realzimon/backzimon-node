@@ -9,19 +9,19 @@ ZiviService.findOneByName = function (name, callback) {
 };
 
 ZiviService.findAll = function (callback) {
-  models.Zivi.findAll(callback);
+  models.Zivi.find({}).then(callback);
 };
 
 ZiviService.findAllBut = function (ziviExcluded, callback) {
   if (!ziviExcluded) {
-    ZiviService.findAll(callback);
+    ZiviService.find({}).then(callback);
   } else {
     models.Zivi.find({
       _id: {
         $ne: ziviExcluded._id
       }
-    }, callback);
+    }).then(callback);
   }
 };
 
-return ZiviService;
+module.exports = ZiviService;

@@ -1,7 +1,7 @@
-var io = require('socket.io')(4001);
 var shuffle = require('shuffle-array');
 var models = require('../models/index');
 var ZiviService = require('./../services/zivi.service.js');
+var SocketService = require('./../services/socket.service');
 
 var ZiviTimer = {};
 const TIMER_SOCKET_NAME = 'timer';
@@ -9,7 +9,7 @@ ZiviTimer.ZIVI_TIMER_INTERVAL = 600;
 ZiviTimer.remainingSeconds = ZiviTimer.ZIVI_TIMER_INTERVAL;
 
 ZiviTimer.pushTimerData = function () {
-  io.sockets.emit(TIMER_SOCKET_NAME, {
+  SocketService.writeToSocket(TIMER_SOCKET_NAME, {
     remaining: ZiviTimer.remainingSeconds
   });
 };
@@ -39,4 +39,4 @@ function tickTimer() {
 ZiviTimer.shuffleZivisAndSaveOrder();
 setInterval(tickTimer, 1000);
 
-return ZiviTimer;
+module.exports = ZiviTimer;

@@ -1,8 +1,8 @@
-var io = require('socket.io')(4001);
 var shuffle = require('shuffle-array');
 const STATES = require('../config/states');
 var models = require('../models/index');
 var PostService = require('./../services/post.service.js');
+var SocketService = require('./../services/socket.service');
 
 var PostTimer = {};
 
@@ -102,9 +102,9 @@ function isBeforeHM(date, hour, minute) {
 }
 
 PostTimer.pushPostState = function () {
-  io.sockets.emit('post', {
+  SocketService.writeToSocket('post', {
     update: 'state'
   });
 };
 
-return PostTimer;
+module.exports = PostTimer;

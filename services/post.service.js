@@ -12,7 +12,7 @@ PostService.findCurrentState = function (callback) {
 
 PostService.attemptSave = function (post, callback) {
   post.save(function (err) {
-    if (!!callback) {
+    if (callback) {
       callback(err);
     }
   });
@@ -111,4 +111,4 @@ PostService.startPreparationState = function (callback) {
   });
 };
 
-return PostService;
+module.exports = PostService;
