@@ -1,9 +1,7 @@
 var express = require('express');
 var router = express.Router();
-var shuffle = require('shuffle-array');
 
 const STATES = require('../../config/states');
-var models = require('../../models/index');
 var PostService = require('../../services/post.service.js');
 
 router.get('/', function (req, res) {
@@ -24,12 +22,13 @@ function orRespond(res, status, message) {
   };
 }
 
+//noinspection JSUnresolvedFunction
 /**
  * Changes the state on the server, the valid options are:
  * next: the chosen one, does not accept the offer, or is not available today, so the next
  * person will be chosen (randomly)
  * cancel: there is no post for today
- * accepted: zimon made an offer that cant be refused and the zivi has accepted it
+ * accepted: Zimon made an offer that cant be refused and the zivi has accepted it
  */
 router.put('/', function (req, res) {
   var action = req.body.action;
@@ -38,9 +37,7 @@ router.put('/', function (req, res) {
       err: 'No action given'
     });
   }
-
   console.log(' -- post action: ' + action);
-
   switch (action) {
     case 'next':
       PostService.nextZivi(orRespond(res, 500));
@@ -59,7 +56,6 @@ router.put('/', function (req, res) {
         err: 'Illegal action'
       });
   }
-
 });
 
 router.post('/', function (req, res) {

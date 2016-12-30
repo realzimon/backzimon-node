@@ -39,7 +39,7 @@ router.post('/', function(req, res){
       count: 0
     });
 
-    quote.save(function(err, _){
+    quote.save(function(err){
       if(err){
         return res.status(500).json({
           err: err
