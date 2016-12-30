@@ -3,9 +3,7 @@ var models = require('../models/index');
 var ZiviService = {};
 
 ZiviService.findOneByName = function (name, callback) {
-  models.Zivi.findOne({name: name}).then(function (zivi) {
-    callback(zivi);
-  });
+  models.Zivi.findOne({name: name}).then(callback);
 };
 
 ZiviService.findAll = function (callback) {
@@ -14,7 +12,7 @@ ZiviService.findAll = function (callback) {
 
 ZiviService.findAllBut = function (ziviExcluded, callback) {
   if (!ziviExcluded) {
-    ZiviService.find({}).then(callback);
+    ZiviService.findAll(callback);
   } else {
     models.Zivi.find({
       _id: {
