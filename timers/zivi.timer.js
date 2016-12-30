@@ -18,16 +18,19 @@ ZiviTimer.shuffleZivisAndSaveOrder = function () {
   ZiviService.findAll(function (zivis) {
     var ziviCount = zivis.length;
     var selectedZivis = [];
-    for(var i = 0; i <= ziviCount; i++){
+    for (var i = 0; i <= ziviCount; i++) {
       var zivi = selectZiviFairly(createFairArray(getMaxFirstZiviCount(zivis), zivis));
       selectedZivis.push(zivi);
-      zivis = zivis.filter(function(element){
+      zivis = zivis.filter(function (element) {
         return element._id !== zivi._id;
       });
     }
     if (selectedZivis.length > 0) {
       selectedZivis[0].first += 1;
       for (var j = 0; j < selectedZivis.length; j++) {
+        if (selectedZivis[j] === undefined) { // idk
+          continue;
+        }
         selectedZivis[j].order = j + 1;
         selectedZivis[j].save();
       }
@@ -35,27 +38,27 @@ ZiviTimer.shuffleZivisAndSaveOrder = function () {
   });
 };
 
-function getMaxFirstZiviCount(zivis){
+function getMaxFirstZiviCount(zivis) {
   var max = -1;
-  zivis.forEach(function(zivi){
-    if(zivi.first > max){
+  zivis.forEach(function (zivi) {
+    if (zivi.first > max) {
       max = zivi.first;
     }
   });
   return max;
 }
 
-function createFairArray(max, zivis){
+function createFairArray(max, zivis) {
   var fairArray = [];
-  zivis.forEach(function(zivi){
-    for(var i = 0; i < max - zivi.first + 1; i++){
+  zivis.forEach(function (zivi) {
+    for (var i = 0; i < max - zivi.first + 1; i++) {
       fairArray.push(zivi);
     }
   });
   return fairArray;
 }
 
-function selectZiviFairly(fairArray){
+function selectZiviFairly(fairArray) {
   shuffle(fairArray);
   return fairArray[0];
 }
