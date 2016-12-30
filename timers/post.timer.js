@@ -69,7 +69,7 @@ function checkReminderState(post) {
 
 function shouldPreparePost(post) {
   return timeIsAfterButLastActionIsBefore(post, 10, 45) ||
-    timeIsAfterButLastActionIsBefore(post, 15, 13);
+    timeIsAfterButLastActionIsBefore(post, 14, 45);
 }
 
 const A_MINUTE_IN_MILLIS = 60 * 1000;
