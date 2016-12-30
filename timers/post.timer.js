@@ -68,7 +68,7 @@ function checkReminderState(post) {
 }
 
 function shouldPreparePost(post) {
-  return timeIsAfterButLastActionIsBefore(post, 10, 7) ||
+  return timeIsAfterButLastActionIsBefore(post, 10, 45) ||
     timeIsAfterButLastActionIsBefore(post, 14, 45);
 }
 
