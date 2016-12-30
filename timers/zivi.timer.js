@@ -65,11 +65,11 @@ function selectZiviFairly(fairArray) {
 
 function tickTimer() {
   ZiviTimer.remainingSeconds--;
-  ZiviTimer.pushTimerData();
   if (ZiviTimer.remainingSeconds === 0) {
     ZiviTimer.remainingSeconds = ZiviTimer.ZIVI_TIMER_INTERVAL;
     ZiviTimer.shuffleZivisAndSaveOrder();
   }
+  ZiviTimer.pushTimerData();
 }
 
 ZiviTimer.shuffleZivisAndSaveOrder();
