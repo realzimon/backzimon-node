@@ -1,10 +1,9 @@
-const STATES = require('../config/states');
 var models = require('../models/index');
 
 var ZiviService = {};
 
 ZiviService.findOneByName = function (name, callback) {
-  models.Zivi.findOne({name: post.zivi.name}).then(function (zivi) {
+  models.Zivi.findOne({name: name}).then(function (zivi) {
     callback(zivi);
   });
 };
