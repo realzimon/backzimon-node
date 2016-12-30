@@ -16,16 +16,49 @@ ZiviTimer.pushTimerData = function () {
 
 ZiviTimer.shuffleZivisAndSaveOrder = function () {
   ZiviService.findAll(function (zivis) {
-    shuffle(zivis);
-    if (zivis.length > 0) {
-      zivis[0].first += 1;
-      for (var i = 0; i < zivis.length; i++) {
-        zivis[i].order = i + 1;
-        zivis[i].save();
+    var ziviCount = zivis.length;
+    var selectedZivis = [];
+    for(var i = 0; i <= ziviCount; i++){
+      var zivi = selectZiviFairly(createFairArray(getMaxFirstZiviCount(zivis), zivis));
+      selectedZivis.push(zivi);
+      zivis = zivis.filter(function(element){
+        return element._id !== zivi._id;
+      });
+    }
+    if (selectedZivis.length > 0) {
+      selectedZivis[0].first += 1;
+      for (var j = 0; j < selectedZivis.length; j++) {
+        selectedZivis[j].order = j + 1;
+        selectedZivis[j].save();
       }
     }
   });
 };
+
+function getMaxFirstZiviCount(zivis){
+  var max = -1;
+  zivis.forEach(function(zivi){
+    if(zivi.first > max){
+      max = zivi.first;
+    }
+  });
+  return max;
+}
+
+function createFairArray(max, zivis){
+  var fairArray = [];
+  zivis.forEach(function(zivi){
+    for(var i = 0; i < max - zivi.first + 1; i++){
+      fairArray.push(zivi);
+    }
+  });
+  return fairArray;
+}
+
+function selectZiviFairly(fairArray){
+  shuffle(fairArray);
+  return fairArray[0];
+}
 
 function tickTimer() {
   ZiviTimer.remainingSeconds--;

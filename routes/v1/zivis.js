@@ -6,7 +6,6 @@ var ZiviService = require('../../services/zivi.service');
 
 router.get('/', function (req, res) {
   models.Zivi.find({}).sort('order').exec(function(err, response){
-    console.log(err);
     return res.json({
       zivicount: response.length,
       zivis: response
