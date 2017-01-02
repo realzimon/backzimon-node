@@ -22,4 +22,8 @@ ZiviService.findAllBut = function (ziviExcluded, callback) {
   }
 };
 
+ZiviService.saveZivi = function(zivi, callback){
+  zivi.save(callback);
+};
+
 module.exports = ZiviService;

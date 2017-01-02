@@ -1,7 +1,9 @@
 var shuffle = require('shuffle-array');
 const STATES = require('../config/states');
 var models = require('../models/index');
-var PostService = require('./../services/post.service.js');
+var PostService = require('./../services/post.service');
+var ZiviService = require('./../services/zivi.service');
+var TelegramService = require('./../services/telegram.service');
 
 var TIME_FOR_PREP;
 var TIME_FOR_ACTION;
@@ -54,7 +56,8 @@ function determineActionForIdleState(expectedState){
   switch (expectedState){
     case STATES.PREPERATION:
       return function(){
-        PostService.startPreparationState(function(){
+        PostService.startPreparationState(function(err, post){
+          TelegramService.sendZiviUpdateToUser(post.zivi, 'You are the selected postler');
           return console.log('State was set to prep');
         });
       };
@@ -72,7 +75,8 @@ function determineActionForPrepState(expectedState){
     //Expected state change, we credit the user if he did not accept it automatically
     case STATES.ACTION:
       return function(){
-        PostService.acceptPost(function(){
+        PostService.acceptPost(function(err, zivi){
+          TelegramService.sendZiviUpdateToUser(zivi, 'You automatically accepted the offer, because you did not respond.');
           return console.log('State was set to action');
         });
       };
@@ -99,7 +103,8 @@ function determineActionForActionState(expectedState){
       return function(){
         PostService.findCurrentState(function(post){
           if((post.timestamp < TIME_FOR_PREP[0] || post.timestamp >= TIME_FOR_ACTION[0]) && (post.timestamp < TIME_FOR_PREP[1] || post.timestamp >= TIME_FOR_ACTION[1])){
-            PostService.startPreparationState(function(){
+            PostService.startPreparationState(function(err, zivi){
+              TelegramService.sendZiviUpdateToUser(zivi, 'You are the selected postler');
               return console.log('state was set to prep');
             });
           }
@@ -125,7 +130,8 @@ function determineActionForReminderState(expectedState){
       };
     case STATES.PREPERATION:
       return function(){
-        PostService.startPreparationState(function(){
+        PostService.startPreparationState(function(post){
+          TelegramService.sendZiviUpdateToUser(post.zivi, 'You are the selected postler');
           return console.log('state was set to prep');
         });
       };
@@ -191,69 +197,7 @@ function isWeekend(date) {
   // Actually Js is right with having the sunday == 0, take a closer look at the norm
 }
 
-function pushStateOrLog(prefix) {
-  return function (err) {
-    if (err) {
-      console.error(' ## postchecker.service | ', prefix ? prefix : 'error', ' : ', err);
-    }
-  }
-}
-
-function checkIdleState(post) {
-  // wait for preparation for post
-  if (shouldPreparePost(post)) {
-    PostService.startPreparationState(pushStateOrLog('idle -> prepare'));
-  }
-}
-
-function checkPreparationState(post) {
-  // no-op, wait for user input
-}
-
-function checkActionState(post) {
-  // wait for the Zivi to return for fifteen minutes,
-  // then ask him to  confirm the return of the yellow card
-  if (lastActionMoreThanMinutesAgo(post, 15)) {
-    PostService.startReminderState(pushStateOrLog('action -> reminder'));
-  }
-}
-
-function checkReminderState(post) {
-  // no-op, wait for user input
-}
-
-function shouldPreparePost(post) {
-  return timeIsAfterButLastActionIsBefore(post, 10, 45) ||
-    timeIsAfterButLastActionIsBefore(post, 14, 45);
-}
-
-const A_MINUTE_IN_MILLIS = 60 * 1000;
-function lastActionMoreThanMinutesAgo(post, minutes) {
-  var now = new Date();
-  return (now - post.timestamp) > (minutes * A_MINUTE_IN_MILLIS);
-}
-
-function timeIsAfterButLastActionIsBefore(post, hour, minute) {
-  return timeIsAfterHM(hour, minute) && lastActionBeforeHM(post, hour, minute);
-}
-
-function timeIsAfterHM(hour, minute) {
-  return isAfterHM(new Date(), hour, minute);
-}
-
-function isAfterHM(date, hour, minute) {
-  return date.getHours() > hour || (date.getHours() == hour && date.getMinutes() >= minute);
-}
-
-function lastActionBeforeHM(post, hour, minute) {
-  return isBeforeHM(post.timestamp, hour, minute);
-}
-
-function isBeforeHM(date, hour, minute) {
-  return date.getHours() < hour || (date.getHours() == hour && date.getMinutes() <= minute);
-}
-
-const FIVE_SECONDS = 5 * 1000;
+const FIVE_SECONDS = 1000;
 setInterval(PostTimer.checkAndNotify, FIVE_SECONDS);
 PostService.pushPostState();
 

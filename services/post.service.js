@@ -5,6 +5,8 @@ var models = require('../models/index');
 var ZiviService = require('./zivi.service');
 var SocketService = require('./socket.service');
 
+
+
 var PostService = {};
 
 PostService.findCurrentState = function (callback) {
@@ -14,12 +16,13 @@ PostService.findCurrentState = function (callback) {
 };
 
 PostService.attemptSave = function (post, callback) {
-  post.save(function (err) {
-    if (callback) {
+  post.save(function (err, post) {
+    if (err) {
       callback(err);
     }
     if(!err) {
       PostService.pushPostState();
+      callback(null, post);
     }
   });
 };
@@ -47,15 +50,15 @@ PostService.acceptPost = function (callback) {
     if (post.state !== STATES.PREPERATION) {
       return callback && callback('Can only accept in preparation state, is: ' + post.state);
     }
-    PostService.setStateOn(post, STATES.ACTION, function (err) {
+    PostService.setStateOn(post, STATES.ACTION, function (err, post) {
       if (err) {
         return callback && callback('Unable to set state');
       } else {
-        PostService.incrementPostCount(post, function (err) {
+        PostService.incrementPostCount(post, function (err, post) {
           if (err) {
             return callback && callback('Unable to credit Zivi');
           } else {
-            return callback && callback();
+            return callback && callback(null, post);
           }
         });
       }
@@ -69,7 +72,7 @@ PostService.incrementPostCount = function (post, callback) {
   }
   ZiviService.findOneByName(post.zivi.name, function (zivi) {
     zivi.post_count += 1;
-    zivi.save(callback);
+    ZiviService.saveZivi(zivi, callback);
   });
 };
 

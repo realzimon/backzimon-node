@@ -2,7 +2,13 @@ var express = require('express');
 var router = express.Router();
 
 const STATES = require('../../config/states');
-var PostService = require('../../services/post.service.js');
+var PostService = require('../../services/post.service');
+var TelegramService = require('../../services/telegram.service');
+
+var TelegramBot = require('node-telegram-bot-api');
+var bot = new TelegramBot(' -- insert api key --', {
+  polling: true
+});
 
 router.get('/', function (req, res) {
   PostService.findCurrentState(function (response) {
@@ -40,16 +46,25 @@ router.put('/', function (req, res) {
   console.log(' -- post action: ' + action);
   switch (action) {
     case 'next':
-      PostService.nextZivi(orRespond(res, 500));
+      PostService.nextZivi(function(err, post){
+        TelegramService.sendZiviUpdateToUser(post.zivi, 'You are the selected postler!')
+        return res.json();
+      });
       break;
     case 'accepted':
-      PostService.acceptPost(orRespond(res, 500));
+      PostService.acceptPost(function(){
+        return res.json();
+      });
       break;
     case 'cancel':
-      PostService.justSetState(STATES.IDLE, orRespond(res, 500));
+      PostService.justSetState(STATES.IDLE, function(){
+        return res.json();
+      });
       break;
     case 'dismiss-reminder':
-      PostService.dismissReminder(orRespond(res, 500));
+      PostService.dismissReminder(function(){
+        return res.json();
+      });
       break;
     default:
       return res.status(400).json({

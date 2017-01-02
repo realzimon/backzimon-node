@@ -30,7 +30,8 @@ models.Zivi.remove({}, function(){
       colorHex: el.colorHex,
       picture: el.picture,
       first: 0,
-      order: 0
+      order: 0,
+      chat: -1
     });
     zivi.save(function (err, res) {
       console.log('Inserted: ', res);

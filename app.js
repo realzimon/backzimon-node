@@ -10,6 +10,7 @@ var zivis = require('./routes/v1/zivis');
 var post = require('./routes/v1/post');
 require('./timers/zivi.timer.js');
 require('./timers/post.timer.js');
+require('./services/telegram.service');
 
 var app = express();
 

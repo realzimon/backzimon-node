@@ -26,8 +26,9 @@ var Zivi = mongoose.model('zivi', mongoose.Schema({
   color: String,
   colorHex: String,
   picture: String,
-  first: 0,
-  order: 0
+  first: Number,
+  order: Number,
+  chat: Number
 }));
 
 var Post = mongoose.model('post', mongoose.Schema({
