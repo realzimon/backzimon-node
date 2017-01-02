@@ -36,10 +36,10 @@ bot.onText(/\/init (.+)/, function(msg, match){
 bot.onText(/\/accept/, function(msg, match){
   PostService.findCurrentState(function(post){
     if(post.state !== STATES.PREPERATION){
-      return bot.sendMessage(msg.chat.id, 'Post is not in preparing state');
+      //return bot.sendMessage(msg.chat.id, 'Post is not in preparing state');
     }
     if(post.zivi.chat !== msg.chat.id){
-      return bot.sendMessage(msg.chat.id, 'You are not the selected postler');
+      //return bot.sendMessage(msg.chat.id, 'You are not the selected postler');
     }
     PostService.acceptPost(function(){
       bot.sendMessage(msg.chat.id, 'Post accepted');

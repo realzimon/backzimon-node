@@ -5,11 +5,6 @@ const STATES = require('../../config/states');
 var PostService = require('../../services/post.service');
 var TelegramService = require('../../services/telegram.service');
 
-var TelegramBot = require('node-telegram-bot-api');
-var bot = new TelegramBot(' -- insert api key --', {
-  polling: true
-});
-
 router.get('/', function (req, res) {
   PostService.findCurrentState(function (response) {
     return res.json(response);
