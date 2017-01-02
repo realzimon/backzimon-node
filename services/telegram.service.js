@@ -17,29 +17,36 @@ var bot = new TelegramBot(apiKey, {
 });
 
 bot.onText(/\/start/, function (msg, match) {
-  return bot.sendMessage(msg.chat.id, 'To initialise this bot with your profile, type: /init <Your first name> (Case sensitive)\n' +
-    'For help, type: /help');
+  return bot.sendMessage(msg.chat.id, 'Hello, it me, El Señor Chefzimon.\n' +
+    'First and foremost, if you have no idea what this is, please kindly leave. I dislike strangers.\n' +
+    'If you are authorised by the authorities to communicate with me, kindly tell me your registered' +
+    'first name using /init <Your first name>. Note that the first name is case-sensitive.\n\n' +
+    'If you require assistance, type /help and I will silently ignore your request but print a standardised message.');
 });
 
 bot.onText(/\/help/, function (msg, match) {
-  return bot.sendMessage(msg.chat.id, 'These commands are available:\n' +
-    '/init <first name> - Initialises this bot to work with your account\n' +
-    '/postler - Gets the currently selected Postler\n' +
+  return bot.sendMessage(msg.chat.id, 'My name is El Señor Chefzimon.\n' +
+    'I can (but would prefer not to) do these amazing things:\n' +
+    '/init <first name> - Registers your account with me\n' +
+    '/postler - Asks me for the current Postler\n' +
     '/accept - Accepts your post offer and increments your counter\n' +
-    '/next - Refuses the post offer and chooses somebody else (chosen randomly and fairly)\n');
+    '/next - Refuses the post offer, choosing somebody else using my entirely fair algorithm\n\n' +
+    'If you encounter any issues, feel free to open an issue on GitHub: https://github.com/realzimon/backzimon-node');
 });
 
 bot.onText(/\/init (.+)/, function (msg, match) {
   ZiviService.findOneByName(match[1], function (zivi) {
     if (!zivi) {
-      return bot.sendMessage(msg.chat.id, 'No Zivi found for this name (Case sensitive)');
+      return bot.sendMessage(msg.chat.id, 'Sorry, El Señor Chefzimon is not aware of anyone with this name. Note that ' +
+        'the name is case-sensitive. Do not hack El Señor Chefzimon because he possesses great power beyond human imagination.');
     }
     zivi.chat = msg.chat.id;
     ZiviService.saveZivi(zivi, function (err) {
       if (err) {
-        return bot.sendMessage(msg.chat.id, 'Something went wrong while saving :(');
+        return bot.sendMessage(msg.chat.id, 'El Señor Chefzimon is not sorry, but an error occurred either way.');
       }
-      bot.sendMessage(msg.chat.id, 'Updated your status, you will now receive post updates!');
+      bot.sendMessage(msg.chat.id, 'You have connected your Telegram account to El Señor Chefzimon. He will now read ' +
+        'all the messages you send to him. Do not send nudes.');
     });
   });
 });
@@ -49,9 +56,9 @@ bot.onText(/\/postler/, function (msg, match) {
   checkAccountInitialisedOrFail(msg, function (init) {
     PostService.findCurrentState(function (post) {
       if (post.state === STATES.IDLE || !post.zivi) {
-        return bot.sendMessage(msg.chat.id, 'Nobody has been selected. Stay alert.');
+        return bot.sendMessage(msg.chat.id, 'Nobody has been selected yet. Stay alert.');
       }
-      return bot.sendMessage(msg.chat.id, post.zivi.name + ' is The Chosen One.');
+      return bot.sendMessage(msg.chat.id, post.zivi.name + ' will carry out the Honourable Task.');
     });
   });
 
@@ -59,61 +66,60 @@ bot.onText(/\/postler/, function (msg, match) {
 
 bot.onText(/\/accept/, function (msg, match) {
   checkAccountInitialisedOrFail(msg, function (init) {
-    PostService.findCurrentState(function (post) {
-      if (post.state !== STATES.PREPARATION) {
-        return bot.sendMessage(msg.chat.id, 'Post is not in preparing state');
+    findPostAndCheckPreconditions(msg, function (err, post) {
+      if (err) {
+        return bot.sendMessage(msg.chat.id, err);
+      } else {
+        PostService.acceptPost(function () {
+          bot.sendMessage(msg.chat.id, 'You have agreed to carry out the Honourable Task. Please note that this is ' +
+            'a legally binding agreement. Should you not carry out the Honourable Task, your second-born child belongs ' +
+            'to El Señor Chefzimon. Take care.');
+          PostService.pushPostState();
+        });
       }
-      if (!post.zivi || post.zivi.chat !== msg.chat.id) {
-        return bot.sendMessage(msg.chat.id, 'You are not the selected postler');
-      }
-      PostService.acceptPost(function () {
-        bot.sendMessage(msg.chat.id, 'Post accepted');
-        PostService.pushPostState();
-      });
-    })
+    });
   });
 });
 
 bot.onText(/\/next/, function (msg, match) {
-
   checkAccountInitialisedOrFail(msg, function (init) {
-    PostService.findCurrentState(function (post) {
-      if (post.state !== STATES.PREPARATION) {
-        return bot.sendMessage(msg.chat.id, 'Post is not in preparation state');
+    findPostAndCheckPreconditions(msg, function (err, post) {
+      if (err) {
+        return bot.sendMessage(msg.chat.id, err);
+      } else {
+        PostService.nextZivi(function (err, post) {
+          bot.sendMessage(msg.chat.id, post.zivi.name + ' will carry out the Honourable Task.');
+          PostService.pushPostState();
+          TelegramService.sendPostlerPromptTo(post.zivi);
+        });
       }
-      if (!post.zivi || post.zivi.chat !== msg.chat.id) {
-        return bot.sendMessage(msg.chat.id, 'You are not the selected Postler');
-      }
-      PostService.nextZivi(function (err, post) {
-        bot.sendMessage(msg.chat.id, post.zivi.name + ' will carry out the honourable task.');
-        PostService.pushPostState();
-        TelegramService.sendPostlerPromptTo(post.zivi);
-      });
     });
   });
 });
 
 bot.onText(/\/cancel/, function (msg, match) {
   checkAccountInitialisedOrFail(msg, function (init) {
-    PostService.findCurrentState(function (post) {
-      if (post.state !== STATES.PREPARATION) {
-        return bot.sendMessage(msg.chat.id, 'Post is not in preparation state.');
+    findPostAndCheckPreconditions(msg, function (err, post) {
+      if (err) {
+        return bot.sendMessage(msg.chat.id, err);
+      } else {
+        PostService.justSetState(STATES.IDLE, function (err) {
+          if (err) {
+            console.error(' ## error cancelling Telegram post', err);
+            bot.sendMessage(msg.chat.id, 'Error cancelling the Honourable Task. Try again later.')
+          } else {
+            bot.sendMessage(msg.chat.id, 'You have declined the Honourable Task and therefore ruined the fun for everyone. ' +
+              'EL Señor Chefzimon is not amused. He will strike upon thee with great vengeance next time.');
+          }
+        });
       }
-      PostService.justSetState(STATES.IDLE, function (err) {
-        if (err) {
-          console.error(' ## error cancelling Telegram post', err);
-          bot.sendMessage(msg.chat.id, 'Error cancelling the post. Try again later.')
-        } else {
-          bot.sendMessage(msg.chat.id, 'Post has been declined and will not reappear until the next post time.');
-        }
-      })
     });
   });
 });
 
 TelegramService.sendZiviUpdateToUser = function (zivi, message) {
   if (!zivi.chat || zivi.chat === -1) {
-    return console.log('Zivi ' + zivi.name + ' does not have a valid chat id');
+    return console.log(' ## No Telegram chat for', zivi.name);
   }
   bot.sendMessage(zivi.chat, message);
 };
@@ -122,10 +128,10 @@ TelegramService.sendPostlerPromptTo = function (zivi) {
   if (!zivi.chat || zivi.chat === -1) {
     return console.log(' ## No Telegram chat for', zivi.name);
   }
-  bot.sendMessage(zivi.chat, 'Congratulations, you have been selected for Postler!\n' +
-    'You may _accept_ the offer when you\'re leaving,\n' +
-    'request the _next_ Postler now if you cannot complete the post,\n' +
-    'or _cancel_ if there is no need to do the post.', {
+  bot.sendMessage(zivi.chat, 'Congratulations, you have been selected for the Honourable Task!\n' +
+    'You may */accept* the offer later, when you\'re leaving,\n' +
+    'request the */next* Zivi now if you absolutely cannot do it,\n' +
+    'or */cancel* if there is no need.', {
     parse_mode: 'Markdown',
     reply_markup: {
       one_time_keyboard: true,
@@ -150,8 +156,20 @@ function checkAccountInitialisedOrFail(msg, callback) {
     if (init) {
       callback(init);
     } else {
-      return bot.sendMessage(msg.chat.id, 'You have not yet registered with the bot. Type /help for more information.');
+      return bot.sendMessage(msg.chat.id, 'You have not yet registered with the El Señor Chefzimon Telegram Integration. ' +
+        'Type /help for more information.');
     }
+  });
+}
+
+function findPostAndCheckPreconditions(msg, callback) {
+  PostService.findCurrentState(function (post) {
+    if (post.state !== STATES.PREPARATION) {
+      return callback('It\'s not time yet. Have a little patience.');
+    } else if (!post.zivi || post.zivi.chat !== msg.chat.id) {
+      return callback('I\'m sorry, Dave, I cannot do this. You have not been selected for the Honourable Task.');
+    }
+    callback(null, post);
   });
 }
 
