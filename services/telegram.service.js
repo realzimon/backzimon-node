@@ -84,10 +84,10 @@ bot.onText(/\/next/, function (msg, match) {
       if (!post.zivi || post.zivi.chat !== msg.chat.id) {
         return bot.sendMessage(msg.chat.id, 'You are not the selected Postler');
       }
-      PostService.nextZivi(function (err, zivi) {
-        bot.sendMessage(msg.chat.id, zivi.name + ' will carry out the honourable task.');
+      PostService.nextZivi(function (err, post) {
+        bot.sendMessage(msg.chat.id, post.zivi.name + ' will carry out the honourable task.');
         PostService.pushPostState();
-        TelegramService.sendZiviUpdateToUser(zivi, 'You are the selected postler');
+        TelegramService.sendZiviUpdateToUser(post.zivi, 'You are the selected postler');
       });
     });
   });
