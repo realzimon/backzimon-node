@@ -44,56 +44,64 @@ bot.onText(/\/init (.+)/, function(msg, match){
 });
 
 bot.onText(/\/postler/, function(msg, match){
-  if(!isAccountInitialised(msg)){
-    return bot.sendMessage(msg.chat.id, 'This account is not initialized with this bot, for more info type /help');
-  }
-  PostService.findCurrentState(function(post){
-    if(post.state === STATES.IDLE){
-      return bot.sendMessage(msg.chat.id, 'Currently there is no postler selected (state: IDLE)');
+
+  isAccountInitialised(msg, function(init) {
+    if (!init) {
+      return bot.sendMessage(msg.chat.id, 'This account is not initialized with this bot, for more info type /help');
     }
-    if(!post.zivi){
-      return bot.sendMessage(msg.chat.id, 'Currently there is no postler selected');
-    }
-    return bot.sendMessage(msg.chat.id, 'The selected postler is: ' + post.zivi.name);
+    PostService.findCurrentState(function (post) {
+      if (post.state === STATES.IDLE) {
+        return bot.sendMessage(msg.chat.id, 'Currently there is no postler selected (state: IDLE)');
+      }
+      if (!post.zivi) {
+        return bot.sendMessage(msg.chat.id, 'Currently there is no postler selected');
+      }
+      return bot.sendMessage(msg.chat.id, 'The selected postler is: ' + post.zivi.name);
+    });
   });
+
 });
 
 bot.onText(/\/accept/, function(msg, match){
-  if(!isAccountInitialised(msg)){
-    return bot.sendMessage(msg.chat.id, 'This account is not initialized with this bot, for more info type /help');
-  }
-  PostService.findCurrentState(function(post){
-    if(post.state !== STATES.PREPARATION){
-      return bot.sendMessage(msg.chat.id, 'Post is not in preparing state');
+  isAccountInitialised(msg, function(init) {
+    if (!init) {
+      return bot.sendMessage(msg.chat.id, 'This account is not initialized with this bot, for more info type /help');
     }
-    if(!post.zivi || post.zivi.chat !== msg.chat.id){
-      return bot.sendMessage(msg.chat.id, 'You are not the selected postler');
-    }
-    PostService.acceptPost(function(){
-      bot.sendMessage(msg.chat.id, 'Post accepted');
-      PostService.pushPostState();
-    });
-  })
+    PostService.findCurrentState(function (post) {
+      if (post.state !== STATES.PREPARATION) {
+        return bot.sendMessage(msg.chat.id, 'Post is not in preparing state');
+      }
+      if (!post.zivi || post.zivi.chat !== msg.chat.id) {
+        return bot.sendMessage(msg.chat.id, 'You are not the selected postler');
+      }
+      PostService.acceptPost(function () {
+        bot.sendMessage(msg.chat.id, 'Post accepted');
+        PostService.pushPostState();
+      });
+    })
+  });
 });
 
 bot.onText(/\/next/, function(msg, match){
 
-  if(!isAccountInitialised(msg)){
-    return bot.sendMessage(msg.chat.id, 'This account is not initialized with this bot, for more info type /help');
-  }
-  PostService.findCurrentState(function(post){
-    if(post.state !== STATES.PREPARATION){
-      return bot.sendMessage(msg.chat.id, 'Post is not in preparing state');
+  isAccountInitialised(msg, function(init){
+    if(!init){
+      return bot.sendMessage(msg.chat.id, 'This account is not initialized with this bot, for more info type /help');
     }
-    if(!post.zivi || post.zivi.chat !== msg.chat.id){
-      return bot.sendMessage(msg.chat.id, 'You are not the selected postler');
-    }
-    PostService.nextZivi(function(err, zivi){
-      bot.sendMessage(msg.chat.id, 'Selected another zivi');
-      PostService.pushPostState();
-      TelegramService.sendZiviUpdateToUser(zivi, 'You are the selected postler');
+    PostService.findCurrentState(function(post){
+      if(post.state !== STATES.PREPARATION){
+        return bot.sendMessage(msg.chat.id, 'Post is not in preparing state');
+      }
+      if(!post.zivi || post.zivi.chat !== msg.chat.id){
+        return bot.sendMessage(msg.chat.id, 'You are not the selected postler');
+      }
+      PostService.nextZivi(function(err, zivi){
+        bot.sendMessage(msg.chat.id, 'Selected another zivi');
+        PostService.pushPostState();
+        TelegramService.sendZiviUpdateToUser(zivi, 'You are the selected postler');
+      });
     });
-  })
+  });
 });
 
 TelegramService.sendZiviUpdateToUser = function(zivi, message){
@@ -103,15 +111,16 @@ TelegramService.sendZiviUpdateToUser = function(zivi, message){
   bot.sendMessage(zivi.chat, message);
 };
 
-function isAccountInitialised(msg){
+function isAccountInitialised(msg, callback){
   var chatId = msg.chat.id;
   ZiviService.findAll(function(zivis){
+    var init = false;
     zivis.forEach(function(zivi){
       if(zivi.chat === chatId){
-        return true;
+        init = true;
       }
     });
-    return false;
+    callback(init);
   });
 }
 
