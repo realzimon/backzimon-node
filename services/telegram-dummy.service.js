@@ -8,4 +8,8 @@ TelegramService.sendZiviUpdateToUser = function (zivi, message) {
 
 };
 
+TelegramService.sendPostlerPromptTo = function (zivi) {
+
+};
+
 module.exports = TelegramService;
