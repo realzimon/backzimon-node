@@ -4,6 +4,8 @@
  */
 var TelegramService = {};
 
-TelegramService.sendZiviUpdateToUser = function () {
+TelegramService.sendZiviUpdateToUser = function (zivi, message) {
 
 };
+
+module.exports = TelegramService;

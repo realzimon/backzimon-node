@@ -12,14 +12,14 @@ mongoose.connection = {
 };
 
 var ZiviService = require('../services/zivi.service.js');
-sinon.stub(ZiviService, 'findAll', function () {
-  return [{name: 'lel', post_count: 0}];
+sinon.stub(ZiviService, 'findAll', function (callback) {
+  callback && callback([{name: 'lel', post_count: 0}]);
 });
 
 var PostService = require('../services/post.service.js');
 sinon.stub(PostService, 'pushPostState');
 sinon.stub(PostService, 'attemptSave', function (post, callback) {
-  callback && callback();
+  callback && callback(null, post);
 });
 
 var TestUtils = {};

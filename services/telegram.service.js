@@ -4,10 +4,10 @@ var ConfigService = require('./config.service');
 var STATES = require('../models/states');
 const apiKey = ConfigService.getTelegramApiKey();
 var TelegramService = require('./telegram-dummy.service');
-
 if (!apiKey || process.env.zimonTest) {
   console.warn('Using dummy Telegram service, i.e. ignoring all calls.');
   console.warn('Set an API key in ./config/local-config.json to change this.');
+  module.exports = TelegramService;
   return;
 }
 
