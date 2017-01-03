@@ -59,5 +59,11 @@ describe('PostTimer', function () {
     it.skip('should still switch to preparation at 11:05', function () {
       justCheckFromToExpected(11, 5, STATES.IDLE, STATES.PREPARATION, STATES.ACTION);
     });
+    it('should switch to preparation at 14:45', function () {
+      justCheckFromToExpected(14, 45, STATES.IDLE, STATES.PREPARATION, STATES.PREPARATION);
+    });
+    it.skip('should still switch to preparation at 15:05', function () {
+      justCheckFromToExpected(15, 5, STATES.IDLE, STATES.PREPARATION, STATES.ACTION);
+    });
   });
 });
