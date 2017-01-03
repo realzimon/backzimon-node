@@ -35,7 +35,7 @@ function determineAction(date, post, expectedState) {
   var action;
   switch (post.state) {
     case STATES.IDLE:
-      action = determineActionForIdleState(expectedState);
+      action = determineActionForIdleState(date, post, expectedState);
       break;
     case STATES.PREPARATION:
       action = determineActionForPrepState(expectedState);
@@ -58,11 +58,13 @@ var invokePreparationState = function () {
     });
   };
 };
-function determineActionForIdleState(expectedState) {
+function determineActionForIdleState(date, post, expectedState) {
   switch (expectedState) {
     case STATES.PREPARATION:
     case STATES.ACTION:
-      return invokePreparationState();
+      if (isFifteenMinutesOrMoreAgo(date, post.timestamp)) {
+        return invokePreparationState();
+      }
   }
 }
 
@@ -94,12 +96,6 @@ function isFifteenMinutesOrMoreAgo(now, date) {
 function determineActionForReminderState(expectedState) {
   switch (expectedState) {
     case STATES.PREPARATION:
-      return function () {
-        PostService.justSetState(STATES.IDLE, function () {
-          return console.log(' -- PostTimer: Temporarily switching from reminder to idle because ' +
-            'the next Postler will retrieve the yellow card anyways.');
-        });
-      };
     case STATES.ACTION:
       return invokePreparationState();
   }

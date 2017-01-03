@@ -16,7 +16,7 @@ afterEach(function () {
 function mockPost(state, timestamp) {
   var post = {
     state: state,
-    timestamp: timestamp || new Date(),
+    timestamp: timestamp,
     zivi: null
   };
   return sandbox.stub(PostService, 'findCurrentState', function (callback) {
@@ -24,12 +24,14 @@ function mockPost(state, timestamp) {
   });
 }
 
-function justCheckFromToExpected(hour, minute, initialState, targetState, expectedState) {
-  mockPost(initialState);
+function justCheckFromToExpected(hour, minute, initialState, targetState, expectedState, timestamp) {
+  const date = PostTimer.hourMinuteDateToday(hour, minute);
+  var twentyMinutesAgo = timestamp || new Date(date - 20 * 60 * 1000);
+  mockPost(initialState, twentyMinutesAgo);
   PostTimer.checkWithTime(
-    PostTimer.hourMinuteDateToday(hour, minute),
+    date,
     function (post, action, expected) {
-      expectedState && assert.equal(expected, expectedState, 'expected state');
+      assert.equal(expected, expectedState, 'expected state');
       assert.equal(post.state, targetState, 'final state');
     }
   );
@@ -51,6 +53,10 @@ describe('PostTimer', function () {
     });
     it('should still switch to preparation at 15:05', function () {
       justCheckFromToExpected(15, 5, STATES.IDLE, STATES.PREPARATION, STATES.ACTION);
+    });
+    it('should not re-enter preparation state if last change is less than 15 minutes ago', function () {
+      const fourteenMinutesAgo = new Date(new Date() - 14 * 60 * 1000);
+      justCheckFromToExpected(10, 45, STATES.IDLE, STATES.IDLE, STATES.PREPARATION, fourteenMinutesAgo);
     });
   });
 
@@ -75,14 +81,7 @@ describe('PostTimer', function () {
   describe('from action', function () {
     it('should stay if last state change is less than 15 minutes ago', function () {
       const date = PostTimer.hourMinuteDateToday(11, 20);
-      mockPost(STATES.ACTION, date);
-      PostTimer.checkWithTime(
-        date,
-        function (post, action, expected) {
-          assert.equal(expected, STATES.REMINDER, 'expected state');
-          assert.equal(post.state, STATES.ACTION, 'final state');
-        }
-      );
+      justCheckFromToExpected(11, 20, STATES.ACTION, STATES.ACTION, STATES.REMINDER, date);
     });
     it('should correctly subtract minutes', function () {
       var now = PostTimer.hourMinuteDateToday(10, 5);
@@ -91,14 +90,8 @@ describe('PostTimer', function () {
     });
     it('should change to reminder if last state change is 15 minutes ago', function () {
       const date = PostTimer.hourMinuteDateToday(11, 5);
-      mockPost(STATES.ACTION, new Date(date - 16 * 60 * 1000));
-      PostTimer.checkWithTime(
-        date,
-        function (post, action, expected) {
-          assert.equal(expected, STATES.ACTION, 'expected state');
-          assert.equal(post.state, STATES.REMINDER, 'final state');
-        }
-      );
+      const fifteenMinutesAgo = new Date(date - 15 * 60 * 1000);
+      justCheckFromToExpected(11, 5, STATES.ACTION, STATES.REMINDER, STATES.ACTION, fifteenMinutesAgo);
     })
   });
 
@@ -108,9 +101,7 @@ describe('PostTimer', function () {
       justCheckFromToExpected(12, 0, STATES.REMINDER, STATES.REMINDER, STATES.IDLE);
     });
     it('should move to idle and then preparation at 14:45', function () {
-      justCheckFromToExpected(14, 45, STATES.REMINDER, STATES.IDLE, STATES.PREPARATION);
-      sandbox.restore();
-      justCheckFromToExpected(14, 45, STATES.IDLE, STATES.PREPARATION, STATES.PREPARATION);
+      justCheckFromToExpected(14, 45, STATES.REMINDER, STATES.PREPARATION, STATES.PREPARATION);
     });
     it('should move to idle and then preparation at 15:05', function () {
       justCheckFromToExpected(15, 5, STATES.REMINDER, STATES.PREPARATION, STATES.ACTION);
