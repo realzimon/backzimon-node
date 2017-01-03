@@ -71,4 +71,34 @@ describe('PostTimer', function () {
       justCheckFromToExpected(15, 0, STATES.PREPARATION, STATES.PREPARATION, STATES.ACTION);
     });
   });
+
+  describe('from action', function () {
+    it('should stay if last state change is less than 15 minutes ago', function () {
+      const date = PostTimer.hourMinuteDateToday(11, 20);
+      mockPost(STATES.ACTION, date);
+      PostTimer.checkWithTime(
+        date,
+        function (post, action, expected) {
+          assert.equal(expected, STATES.REMINDER, 'expected state');
+          assert.equal(post.state, STATES.ACTION, 'final state');
+        }
+      );
+    });
+    it('should correctly subtract minutes', function () {
+      var now = PostTimer.hourMinuteDateToday(10, 5);
+      var fifteenMinutesAgo = new Date(now - 15 * 60 * 1000);
+      assert.equal(now - fifteenMinutesAgo, 15 * 60 * 1000, 'minute subtraction does not work');
+    });
+    it('should change to reminder if last state change is 15 minutes ago', function () {
+      const date = PostTimer.hourMinuteDateToday(11, 5);
+      mockPost(STATES.ACTION, new Date(date - 16 * 60 * 1000));
+      PostTimer.checkWithTime(
+        date,
+        function (post, action, expected) {
+          assert.equal(expected, STATES.ACTION, 'expected state');
+          assert.equal(post.state, STATES.REMINDER, 'final state');
+        }
+      );
+    })
+  });
 });

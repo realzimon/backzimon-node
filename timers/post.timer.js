@@ -32,9 +32,6 @@ PostTimer.checkWithTime = function (date, callback) {
 };
 
 function determineAction(date, post, expectedState) {
-  if (post.state === expectedState) {
-    return;
-  }
   var action;
   switch (post.state) {
     case STATES.IDLE:
@@ -44,7 +41,7 @@ function determineAction(date, post, expectedState) {
       action = determineActionForPrepState(expectedState);
       break;
     case STATES.ACTION:
-      action = determineActionForActionState(date, expectedState);
+      action = determineActionForActionState(date, post, expectedState);
       break;
     case STATES.REMINDER:
       action = determineActionForReminderState(expectedState);
@@ -72,32 +69,24 @@ function determineActionForPrepState(expectedState) {
   // it is not safe to assume that the post will actually be done if it is not accepted
 }
 
-function determineActionForActionState(date, expectedState) {
-  switch (expectedState) {
-    case STATES.REMINDER:
-      return function () {
-        PostService.startReminderState(function () {
-          return console.log(' -- PostTimer: Action state could possibly be done, but we don\'t  know, switching to reminder.');
-        });
-      };
-    case STATES.PREPARATION:
-      return function () {
-        PostService.findCurrentState(function (post) {
-          if ((post.timestamp < TIME_FOR_PREP[0] || post.timestamp >= TIME_FOR_ACTION[0]) && (post.timestamp < TIME_FOR_PREP[1] || post.timestamp >= TIME_FOR_ACTION[1])) {
-            PostService.startPreparationState(function (err, zivi) {
-              TelegramService.sendZiviUpdateToUser(zivi, 'You are the selected Postler!');
-              return console.log('-- PostTimer: Starting preparation state right out of action because we don\'t care apparently.');
-            });
-          }
-        });
-      };
-    case STATES.IDLE:
-      return function () {
-        PostService.justSetState(STATES.IDLE, function () {
-          return console.log('-- PostTimer: Switching from action to idle because reminders are for beginners.');
-        });
-      };
+function determineActionForActionState(date, post, expectedState) {
+  if (isFifteenMinutesOrMoreAgo(date, post.timestamp)) {
+    return function () {
+      PostService.startReminderState(function () {
+        return console.log(' -- PostTimer: Action state could possibly be done, but we don\'t  know, switching to reminder.');
+      });
+    };
+  } else if (expectedState === STATES.PREPARATION) {
+    return function () {
+      PostService.justSetState(STATES.IDLE, function () {
+        return console.log('-- PostTimer: Temporarily switching to idle to invoke new preparation.');
+      });
+    };
   }
+}
+
+function isFifteenMinutesOrMoreAgo(now, date) {
+  return (now - date) >= 15 * 60 * 1000;
 }
 
 function determineActionForReminderState(expectedState) {
