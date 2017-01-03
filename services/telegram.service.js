@@ -1,9 +1,15 @@
-var PostService = require('./../services/post.service');
-var ZiviService = require('./../services/zivi.service');
+var PostService = require('./post.service');
+var ZiviService = require('./zivi.service');
+var ConfigService = require('./config.service');
 var STATES = require('../models/states');
-
 var TelegramBot = require('node-telegram-bot-api');
-var bot = new TelegramBot(' -- insert api key --', {
+
+const apiKey = ConfigService.getTelegramApiKey();
+if(!apiKey) {
+  console.error('Starting without a Telegram API key is not supported yet. Please set yours in ./config/local-config.json');
+  process.exit(1);
+}
+var bot = new TelegramBot(apiKey, {
   polling: true
 });
 

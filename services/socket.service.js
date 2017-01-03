@@ -1,4 +1,5 @@
-var io = require('socket.io')(4001);
+var ConfigService = require('./config.service');
+var io = require('socket.io')(ConfigService.getSocketPort());
 
 var SocketService = {};
 

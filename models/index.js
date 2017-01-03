@@ -1,9 +1,10 @@
 var mongoose = require('mongoose');
+var ConfigService = require('../services/config.service');
 
 //See: https://github.com/Automattic/mongoose/issues/4291 for more details on this line
 mongoose.Promise = global.Promise;
 
-mongoose.connect('mongodb://127.0.0.1/zimon');
+mongoose.connect(ConfigService.getMongoUrl());
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 

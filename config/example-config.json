@@ -1,0 +1,6 @@
+{
+  "IMPORTANT-USAGE-NOTE": "Copy this file to local-config.json and adjust to your preferences. Do not edit this example file.",
+  "mongo-url": "mongodb://127.0.0.1/zimon",
+  "telegram-api-key": "",
+  "socket-port": 4001
+}
