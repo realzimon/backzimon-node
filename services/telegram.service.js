@@ -79,16 +79,34 @@ bot.onText(/\/next/, function (msg, match) {
   checkAccountInitialisedOrFail(msg, function (init) {
     PostService.findCurrentState(function (post) {
       if (post.state !== STATES.PREPARATION) {
-        return bot.sendMessage(msg.chat.id, 'Post is not in preparing state');
+        return bot.sendMessage(msg.chat.id, 'Post is not in preparation state');
       }
       if (!post.zivi || post.zivi.chat !== msg.chat.id) {
-        return bot.sendMessage(msg.chat.id, 'You are not the selected postler');
+        return bot.sendMessage(msg.chat.id, 'You are not the selected Postler');
       }
       PostService.nextZivi(function (err, zivi) {
         bot.sendMessage(msg.chat.id, 'Selected another zivi');
         PostService.pushPostState();
         TelegramService.sendZiviUpdateToUser(zivi, 'You are the selected postler');
       });
+    });
+  });
+});
+
+bot.onText(/\/cancel/, function (msg, match) {
+  checkAccountInitialisedOrFail(msg, function (init) {
+    PostService.findCurrentState(function (post) {
+      if (post.state !== STATES.PREPARATION) {
+        return bot.sendMessage(msg.chat.id, 'Post is not in preparation state.');
+      }
+      PostService.justSetState(STATES.IDLE, function (err) {
+        if (err) {
+          console.error(' ## error cancelling Telegram post', err);
+          bot.sendMessage(msg.chat.id, 'Error cancelling the post. Try again later.')
+        } else {
+          bot.sendMessage(msg.chat.id, 'Post has been declined and will not reappear until the next post time.');
+        }
+      })
     });
   });
 });
@@ -107,14 +125,14 @@ TelegramService.sendPostlerPromptTo = function (zivi) {
   bot.sendMessage(zivi.chat, 'Congratulations, you have been selected for Postler!\n' +
     'You may _accept_ the offer when you\'re leaving,\n' +
     'request the _next_ Postler now if you cannot complete the post,\n' +
-    'or _decline_ if there is no need to do the post.', {
+    'or _cancel_ if there is no need to do the post.', {
     parse_mode: 'Markdown',
     reply_markup: {
       one_time_keyboard: true,
       resize_keyboard: true,
       keyboard: [
         ['/accept'],
-        ['/next', '/decline']
+        ['/next', '/cancel']
       ]
     }
   });
