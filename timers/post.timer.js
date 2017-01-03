@@ -20,11 +20,13 @@ PostTimer.checkAndNotify = function () {
   initTimes();
 
   PostService.findCurrentState(function(post){
-    var action = determineAction(post.state, getStateForTime(new Date()));
+    var expectedState = getStateForTime(new Date());
+    var action = determineAction(post.state, expectedState);
     if(!action){
       return;
     }
     //Execute given action
+    console.info(' -- PostTimer: Changing state from ', post.state, ' to ', expectedState, ' at ', new Date());
     action();
   });
 
@@ -58,7 +60,7 @@ function determineActionForIdleState(expectedState){
       return function(){
         PostService.startPreparationState(function(err, post){
           TelegramService.sendZiviUpdateToUser(post.zivi, 'You are the selected postler');
-          return console.log('State was set to prep');
+          return console.log(' -- PostTimer: Changed to preparation state.');
         });
       };
     case STATES.ACTION:
@@ -77,7 +79,7 @@ function determineActionForPrepState(expectedState){
       return function(){
         PostService.acceptPost(function(err, zivi){
           TelegramService.sendZiviUpdateToUser(zivi, 'You automatically accepted the offer, because you did not respond.');
-          return console.log('State was set to action');
+          return console.log(' -- PostTimer: Zivi ', zivi.name, ' did not accept the offer, cruelly accepting for them.');
         });
       };
     //If no user accepted the offer, we just switch it to idle, as if nothing happened
@@ -85,7 +87,7 @@ function determineActionForPrepState(expectedState){
     case STATES.IDLE:
       return function(){
         PostService.justSetState(STATES.IDLE, function(){
-          return console.log('state was set to idle');
+          return console.log(' -- PostTimer: Preparation state ended without action state being expected.');
         });
       };
   }
@@ -96,7 +98,7 @@ function determineActionForActionState(expectedState){
     case STATES.REMINDER:
       return function(){
         PostService.startReminderState(function(){
-          return console.log('state was set to reminder');
+          return console.log(' -- PostTimer: Action state could possibly be don,but we don\'t  know, switching to reminder.');
         });
       };
     case STATES.PREPERATION:
@@ -104,8 +106,8 @@ function determineActionForActionState(expectedState){
         PostService.findCurrentState(function(post){
           if((post.timestamp < TIME_FOR_PREP[0] || post.timestamp >= TIME_FOR_ACTION[0]) && (post.timestamp < TIME_FOR_PREP[1] || post.timestamp >= TIME_FOR_ACTION[1])){
             PostService.startPreparationState(function(err, zivi){
-              TelegramService.sendZiviUpdateToUser(zivi, 'You are the selected postler');
-              return console.log('state was set to prep');
+              TelegramService.sendZiviUpdateToUser(zivi, 'You are the selected Postler!');
+              return console.log('-- PostTimer: Starting preparation state right out of action because we don\'t care apparently.');
             });
           }
         });
@@ -113,7 +115,7 @@ function determineActionForActionState(expectedState){
     case STATES.IDLE:
       return function(){
         PostService.justSetState(STATES.IDLE, function(){
-          return console.log('state was set to idle');
+          return console.log('-- PostTimer: Switching from action to idle because reminders are for beginners.');
         });
       };
   }
@@ -125,14 +127,14 @@ function determineActionForReminderState(expectedState){
     case STATES.IDLE:
       return function(){
         PostService.justSetState(STATES.IDLE, function(){
-          return console.log('state was set to idle');
+          return console.log(' -- PostTimer: Switching from reminder to idle state because who needs the yellow card anyways.');
         });
       };
     case STATES.PREPERATION:
       return function(){
         PostService.startPreparationState(function(post){
           TelegramService.sendZiviUpdateToUser(post.zivi, 'You are the selected postler');
-          return console.log('state was set to prep');
+          return console.log(' -- PostTimer: Switching from reminder to preparation state because who needs the yellow card anyways.');
         });
       };
   }
