@@ -19,24 +19,24 @@ PostTimer.checkAndNotify = function () {
   }
   initTimes();
 
-  PostService.findCurrentState(function(post){
+  PostService.findCurrentState(function (post) {
     var expectedState = getStateForTime(new Date());
     var action = determineAction(post.state, expectedState);
-    if(!action){
+    if (!action) {
       return;
     }
-    console.info(' -- PostTimer: Changing state from ', post.state, ' to ', expectedState, ' at ', new Date());
+    console.info(' -- PostTimer: Changing state from', post.state, 'to', expectedState, 'at', new Date());
     action();
   });
 
 };
 
-function determineAction(currentState, expectedState){
-  if(currentState === expectedState){
+function determineAction(currentState, expectedState) {
+  if (currentState === expectedState) {
     return;
   }
   var action;
-  switch (currentState){
+  switch (currentState) {
     case STATES.IDLE:
       action = determineActionForIdleState(expectedState);
       break;
@@ -53,11 +53,11 @@ function determineAction(currentState, expectedState){
   return action;
 }
 
-function determineActionForIdleState(expectedState){
-  switch (expectedState){
+function determineActionForIdleState(expectedState) {
+  switch (expectedState) {
     case STATES.PREPERATION:
-      return function(){
-        PostService.startPreparationState(function(err, post){
+      return function () {
+        PostService.startPreparationState(function (err, post) {
           TelegramService.sendZiviUpdateToUser(post.zivi, 'You are the selected postler');
           return console.log(' -- PostTimer: Changed to preparation state.');
         });
@@ -67,40 +67,39 @@ function determineActionForIdleState(expectedState){
   }
 }
 
-function determineActionForPrepState(expectedState){
-  switch(expectedState){
+function determineActionForPrepState(expectedState) {
+  switch (expectedState) {
     //Expected state change, we credit the user if he did not accept it automatically
     case STATES.ACTION:
-      return function(){
-        PostService.acceptPost(function(err, zivi){
+      return function () {
+        PostService.acceptPost(function (err, zivi) {
           TelegramService.sendZiviUpdateToUser(zivi, 'You automatically accepted the offer, because you did not respond.');
           return console.log(' -- PostTimer: Zivi ', zivi.name, ' did not accept the offer, cruelly accepting for them.');
         });
       };
-    //If no user accepted the offer, we just switch it to idle, as if nothing happened
     case STATES.REMINDER:
     case STATES.IDLE:
-      return function(){
-        PostService.justSetState(STATES.IDLE, function(){
+      return function () {
+        PostService.justSetState(STATES.IDLE, function () {
           return console.log(' -- PostTimer: Preparation state ended without action state being expected.');
         });
       };
   }
 }
 
-function determineActionForActionState(expectedState){
-  switch(expectedState){
+function determineActionForActionState(expectedState) {
+  switch (expectedState) {
     case STATES.REMINDER:
-      return function(){
-        PostService.startReminderState(function(){
-          return console.log(' -- PostTimer: Action state could possibly be don,but we don\'t  know, switching to reminder.');
+      return function () {
+        PostService.startReminderState(function () {
+          return console.log(' -- PostTimer: Action state could possibly be done, but we don\'t  know, switching to reminder.');
         });
       };
     case STATES.PREPERATION:
-      return function(){
-        PostService.findCurrentState(function(post){
-          if((post.timestamp < TIME_FOR_PREP[0] || post.timestamp >= TIME_FOR_ACTION[0]) && (post.timestamp < TIME_FOR_PREP[1] || post.timestamp >= TIME_FOR_ACTION[1])){
-            PostService.startPreparationState(function(err, zivi){
+      return function () {
+        PostService.findCurrentState(function (post) {
+          if ((post.timestamp < TIME_FOR_PREP[0] || post.timestamp >= TIME_FOR_ACTION[0]) && (post.timestamp < TIME_FOR_PREP[1] || post.timestamp >= TIME_FOR_ACTION[1])) {
+            PostService.startPreparationState(function (err, zivi) {
               TelegramService.sendZiviUpdateToUser(zivi, 'You are the selected Postler!');
               return console.log('-- PostTimer: Starting preparation state right out of action because we don\'t care apparently.');
             });
@@ -108,26 +107,26 @@ function determineActionForActionState(expectedState){
         });
       };
     case STATES.IDLE:
-      return function(){
-        PostService.justSetState(STATES.IDLE, function(){
+      return function () {
+        PostService.justSetState(STATES.IDLE, function () {
           return console.log('-- PostTimer: Switching from action to idle because reminders are for beginners.');
         });
       };
   }
 }
 
-function determineActionForReminderState(expectedState){
-  switch(expectedState){
+function determineActionForReminderState(expectedState) {
+  switch (expectedState) {
     case STATES.ACTION:
     case STATES.IDLE:
-      return function(){
-        PostService.justSetState(STATES.IDLE, function(){
+      return function () {
+        PostService.justSetState(STATES.IDLE, function () {
           return console.log(' -- PostTimer: Switching from reminder to idle state because who needs the yellow card anyways.');
         });
       };
     case STATES.PREPERATION:
-      return function(){
-        PostService.startPreparationState(function(post){
+      return function () {
+        PostService.startPreparationState(function (post) {
           TelegramService.sendZiviUpdateToUser(post.zivi, 'You are the selected postler');
           return console.log(' -- PostTimer: Switching from reminder to preparation state because who needs the yellow card anyways.');
         });
@@ -135,31 +134,31 @@ function determineActionForReminderState(expectedState){
   }
 }
 
-function getStateForTime(date){
-  if(timeForIdle(date)){
+function getStateForTime(date) {
+  if (timeForIdle(date)) {
     return STATES.IDLE;
-  } else if(timeForAction(date)) {
+  } else if (timeForAction(date)) {
     return STATES.ACTION;
-  } else if(timeForPrep(date)){
+  } else if (timeForPrep(date)) {
     return STATES.PREPERATION;
   } else {
     return STATES.REMINDER;
   }
 }
 
-function timeForPrep(date){
+function timeForPrep(date) {
   return (date >= TIME_FOR_PREP[0] && date < TIME_FOR_ACTION[0]) || (date >= TIME_FOR_PREP[1] && date < TIME_FOR_ACTION[1]);
 }
 
-function timeForIdle(date){
+function timeForIdle(date) {
   return date < TIME_FOR_PREP[0] || date > TIME_FOR_IDLE[1] || (date >= TIME_FOR_IDLE[0] && date < TIME_FOR_PREP[1]);
 }
 
-function timeForAction(date){
+function timeForAction(date) {
   return (date >= TIME_FOR_ACTION[0] && date < TIME_FOR_REMINDER[0]) || (date >= TIME_FOR_ACTION[1] && date < TIME_FOR_REMINDER[1]);
 }
 
-function initTimes(){
+function initTimes() {
 
   TIME_FOR_PREP = [
     createDateWithHoursAndMinutes(10, 45),
@@ -182,7 +181,7 @@ function initTimes(){
   ]
 }
 
-function createDateWithHoursAndMinutes(hours, minutes){
+function createDateWithHoursAndMinutes(hours, minutes) {
   var now = new Date();
   return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0, 0)
 }
