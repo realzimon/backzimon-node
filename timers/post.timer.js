@@ -130,26 +130,22 @@ function timeForAction(date) {
 }
 
 function initTimes() {
-
   TIME_FOR_PREP = [
     PostTimer.hourMinuteDateToday(10, 45),
     PostTimer.hourMinuteDateToday(14, 45)
   ];
-
   TIME_FOR_ACTION = [
     PostTimer.hourMinuteDateToday(11, 0),
     PostTimer.hourMinuteDateToday(15, 0)
   ];
-
   TIME_FOR_REMINDER = [
     PostTimer.hourMinuteDateToday(11, 15),
     PostTimer.hourMinuteDateToday(15, 15)
   ];
-
   TIME_FOR_IDLE = [
     PostTimer.hourMinuteDateToday(11, 30),
     PostTimer.hourMinuteDateToday(15, 30)
-  ]
+  ];
 }
 
 PostTimer.hourMinuteDateToday = function (hours, minutes) {
