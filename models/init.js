@@ -50,3 +50,4 @@ models.Post.remove({}, function(){
     console.log('Inserted: ', res);
   })
 });
+process.exit(0);
