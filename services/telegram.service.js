@@ -46,7 +46,7 @@ bot.onText(/\/init (.+)/, function (msg, match) {
 
 bot.onText(/\/postler/, function (msg, match) {
 
-  checkAccountInitialised(msg, function (init) {
+  checkAccountInitialisedOrFail(msg, function (init) {
     PostService.findCurrentState(function (post) {
       if (post.state === STATES.IDLE || !post.zivi) {
         return bot.sendMessage(msg.chat.id, 'Nobody has been selected. Stay alert.');
@@ -58,7 +58,7 @@ bot.onText(/\/postler/, function (msg, match) {
 });
 
 bot.onText(/\/accept/, function (msg, match) {
-  checkAccountInitialised(msg, function (init) {
+  checkAccountInitialisedOrFail(msg, function (init) {
     PostService.findCurrentState(function (post) {
       if (post.state !== STATES.PREPARATION) {
         return bot.sendMessage(msg.chat.id, 'Post is not in preparing state');
@@ -76,7 +76,7 @@ bot.onText(/\/accept/, function (msg, match) {
 
 bot.onText(/\/next/, function (msg, match) {
 
-  checkAccountInitialised(msg, function (init) {
+  checkAccountInitialisedOrFail(msg, function (init) {
     PostService.findCurrentState(function (post) {
       if (post.state !== STATES.PREPARATION) {
         return bot.sendMessage(msg.chat.id, 'Post is not in preparing state');
@@ -100,7 +100,7 @@ TelegramService.sendZiviUpdateToUser = function (zivi, message) {
   bot.sendMessage(zivi.chat, message);
 };
 
-function checkAccountInitialised(msg, callback) {
+function checkAccountInitialisedOrFail(msg, callback) {
   var chatId = msg.chat.id;
   ZiviService.findAll(function (zivis) {
     var init = false;
