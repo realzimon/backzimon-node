@@ -1,0 +1,10 @@
+dist: trusty
+language: node_js
+node_js:
+  - "7"
+os:
+  - linux
+install:
+  - npm install
+script:
+  - npm test
