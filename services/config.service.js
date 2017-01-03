@@ -2,16 +2,24 @@ var fs = require('fs');
 const CONFIG_DIRECTORY = './config/';
 const LOCAL_CONFIG_PATH = CONFIG_DIRECTORY + 'local-config.json';
 const EXAMPLE_CONFIG_PATH = CONFIG_DIRECTORY + 'example-config.json';
-if(!fs.existsSync(LOCAL_CONFIG_PATH)) {
-  console.error('Local config file does not exist!');
-  console.error('Please copy ',EXAMPLE_CONFIG_PATH, 'to', LOCAL_CONFIG_PATH, 'and configure the application!');
-  process.exit(1);
-}
+
 if(!fs.existsSync(EXAMPLE_CONFIG_PATH)) {
   console.error('Example config does not exist. Please restore it from git.');
   process.exit(1);
 }
-var localConfig = JSON.parse(fs.readFileSync(LOCAL_CONFIG_PATH, 'utf8'));
+
+var configPath;
+if(process.env.zimonTest) {
+  configPath = EXAMPLE_CONFIG_PATH;
+} else {
+  if(!fs.existsSync(LOCAL_CONFIG_PATH)) {
+    console.error('Local config file does not exist!');
+    console.error('Please copy ',EXAMPLE_CONFIG_PATH, 'to', LOCAL_CONFIG_PATH, 'and configure the application!');
+    process.exit(1);
+  }
+  configPath = LOCAL_CONFIG_PATH;
+}
+var localConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 
 var ConfigService = {};
 
