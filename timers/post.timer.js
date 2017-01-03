@@ -62,9 +62,22 @@ function determineActionForIdleState(date, post, expectedState) {
   switch (expectedState) {
     case STATES.PREPARATION:
     case STATES.ACTION:
-      if (isFifteenMinutesOrMoreAgo(date, post.timestamp)) {
+      if (isTimestampInFutureAndLogError(date, post) ||
+        isFifteenMinutesOrMoreAgo(date, post.timestamp)) {
         return invokePreparationState();
       }
+  }
+}
+
+function isTimestampInFutureAndLogError(date, post) {
+  if (post.timestamp > date) {
+    console.error(' ## Post timestamp is in the future. Either somebody here is a time traveller, ' +
+      'or the system clock has changed. Resetting timestamp.');
+    post.timestamp = new Date('1970-01-01 13:37:04Z');
+    PostService.attemptSave(post, function (err) {
+      console.log(' -- saved reset post timestamp, err:', err);
+      console.log(' -- new post data:', post);
+    })
   }
 }
 
@@ -74,7 +87,8 @@ function determineActionForPrepState(expectedState) {
 }
 
 function determineActionForActionState(date, post, expectedState) {
-  if (isFifteenMinutesOrMoreAgo(date, post.timestamp)) {
+  if (isTimestampInFutureAndLogError(date, post) ||
+    isFifteenMinutesOrMoreAgo(date, post.timestamp)) {
     return function () {
       PostService.startReminderState(function () {
         return console.log(' -- PostTimer: Action state could possibly be done, but we don\'t  know, switching to reminder.');
