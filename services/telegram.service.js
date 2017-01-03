@@ -17,57 +17,48 @@ var bot = new TelegramBot(apiKey, {
 });
 
 bot.onText(/\/start/, function (msg, match) {
-  return bot.sendMessage(msg.chat.id, 'To initialise this bot with your profile write: /init <Your first name> (Case sensitive)\n' +
-    'For help type: /help');
+  return bot.sendMessage(msg.chat.id, 'To initialise this bot with your profile, type: /init <Your first name> (Case sensitive)\n' +
+    'For help, type: /help');
 });
 
 bot.onText(/\/help/, function (msg, match) {
-  return bot.sendMessage(msg.chat.id, 'Following commands are available:\n' +
-    '/init <First Name> - Initialises this bot to work with your account\n' +
-    '/postler - Gets the current selected postler zivi for the delivery\n' +
-    '/accept - Accepts the post request from the bot and increments the post counter by 1\n' +
-    '/next - Selects the next zivi (chosen randomly and fairly)\n');
+  return bot.sendMessage(msg.chat.id, 'These commands are available:\n' +
+    '/init <first name> - Initialises this bot to work with your account\n' +
+    '/postler - Gets the currently selected Postler\n' +
+    '/accept - Accepts your post offer and increments your counter\n' +
+    '/next - Refuses the post offer and chooses somebody else (chosen randomly and fairly)\n');
 });
 
 bot.onText(/\/init (.+)/, function (msg, match) {
   ZiviService.findOneByName(match[1], function (zivi) {
     if (!zivi) {
-      return bot.sendMessage(msg.chat.id, 'No zivi found for this name (Case sensitive)');
+      return bot.sendMessage(msg.chat.id, 'No Zivi found for this name (Case sensitive)');
     }
     zivi.chat = msg.chat.id;
     ZiviService.saveZivi(zivi, function (err) {
       if (err) {
-        return bot.sendMessage(msg.chat.id, 'Something went wrong while saving');
+        return bot.sendMessage(msg.chat.id, 'Something went wrong while saving :(');
       }
-      bot.sendMessage(msg.chat.id, 'Updated your status, you will now receive post updates');
+      bot.sendMessage(msg.chat.id, 'Updated your status, you will now receive post updates!');
     });
   });
 });
 
 bot.onText(/\/postler/, function (msg, match) {
 
-  isAccountInitialised(msg, function (init) {
-    if (!init) {
-      return bot.sendMessage(msg.chat.id, 'This account is not initialized with this bot, for more info type /help');
-    }
+  checkAccountInitialised(msg, function (init) {
     PostService.findCurrentState(function (post) {
-      if (post.state === STATES.IDLE) {
-        return bot.sendMessage(msg.chat.id, 'Currently there is no postler selected (state: IDLE)');
+      if (post.state === STATES.IDLE || !post.zivi) {
+        return bot.sendMessage(msg.chat.id, 'Nobody has been selected. Stay alert.');
       }
-      if (!post.zivi) {
-        return bot.sendMessage(msg.chat.id, 'Currently there is no postler selected');
-      }
-      return bot.sendMessage(msg.chat.id, 'The selected postler is: ' + post.zivi.name);
+      return bot.sendMessage(msg.chat.id, post.zivi.name + ' is The Chosen One.');
     });
   });
 
 });
 
 bot.onText(/\/accept/, function (msg, match) {
-  isAccountInitialised(msg, function (init) {
-    if (!init) {
-      return bot.sendMessage(msg.chat.id, 'This account is not initialized with this bot, for more info type /help');
-    }
+  checkAccountInitialised(msg, function (init) {
     PostService.findCurrentState(function (post) {
       if (post.state !== STATES.PREPARATION) {
         return bot.sendMessage(msg.chat.id, 'Post is not in preparing state');
@@ -85,10 +76,7 @@ bot.onText(/\/accept/, function (msg, match) {
 
 bot.onText(/\/next/, function (msg, match) {
 
-  isAccountInitialised(msg, function (init) {
-    if (!init) {
-      return bot.sendMessage(msg.chat.id, 'This account is not initialized with this bot, for more info type /help');
-    }
+  checkAccountInitialised(msg, function (init) {
     PostService.findCurrentState(function (post) {
       if (post.state !== STATES.PREPARATION) {
         return bot.sendMessage(msg.chat.id, 'Post is not in preparing state');
@@ -112,7 +100,7 @@ TelegramService.sendZiviUpdateToUser = function (zivi, message) {
   bot.sendMessage(zivi.chat, message);
 };
 
-function isAccountInitialised(msg, callback) {
+function checkAccountInitialised(msg, callback) {
   var chatId = msg.chat.id;
   ZiviService.findAll(function (zivis) {
     var init = false;
@@ -121,7 +109,11 @@ function isAccountInitialised(msg, callback) {
         init = true;
       }
     });
-    callback(init);
+    if (init) {
+      callback(init);
+    } else {
+      return bot.sendMessage(msg.chat.id, 'You have not yet registered with the bot. Type /help for more information.');
+    }
   });
 }
 
