@@ -19,7 +19,7 @@ var bot = new TelegramBot(apiKey, {
 bot.onText(/\/start/, function (msg, match) {
   return bot.sendMessage(msg.chat.id, 'Hello, it me, El Señor Chefzimon.\n' +
     'First and foremost, if you have no idea what this is, please kindly leave. I dislike strangers.\n' +
-    'If you are authorised by the authorities to communicate with me, kindly tell me your registered' +
+    'If you are authorised by the authorities to communicate with me, kindly tell me your registered ' +
     'first name using /init <Your first name>. Note that the first name is case-sensitive.\n\n' +
     'If you require assistance, type /help and I will silently ignore your request but print a standardised message.');
 });
