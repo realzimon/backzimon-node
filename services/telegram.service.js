@@ -100,6 +100,26 @@ TelegramService.sendZiviUpdateToUser = function (zivi, message) {
   bot.sendMessage(zivi.chat, message);
 };
 
+TelegramService.sendPostlerPromptTo = function (zivi) {
+  if (zivi.chat === -1) {
+    return console.log(' ## No Telegram chat for', zivi.name);
+  }
+  bot.sendMessage(zivi.chat, 'Congratulations, you have been selected for Postler!\n' +
+    'You may _accept_ the offer when you\'re leaving,\n' +
+    'request the _next_ Postler now if you cannot complete the post,\n' +
+    'or _decline_ if there is no need to do the post.', {
+      parse_mode: 'Markdown',
+      reply_markup: {
+        one_time_keyboard: true,
+        resize_keyboard: true,
+        keyboard: [
+          ['/accept'],
+          ['/next', '/decline']
+        ]
+      }
+  });
+};
+
 function checkAccountInitialisedOrFail(msg, callback) {
   var chatId = msg.chat.id;
   ZiviService.findAll(function (zivis) {
