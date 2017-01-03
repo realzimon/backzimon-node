@@ -94,29 +94,29 @@ bot.onText(/\/next/, function (msg, match) {
 });
 
 TelegramService.sendZiviUpdateToUser = function (zivi, message) {
-  if (zivi.chat === -1) {
+  if (!zivi.chat || zivi.chat === -1) {
     return console.log('Zivi ' + zivi.name + ' does not have a valid chat id');
   }
   bot.sendMessage(zivi.chat, message);
 };
 
 TelegramService.sendPostlerPromptTo = function (zivi) {
-  if (zivi.chat === -1) {
+  if (!zivi.chat || zivi.chat === -1) {
     return console.log(' ## No Telegram chat for', zivi.name);
   }
   bot.sendMessage(zivi.chat, 'Congratulations, you have been selected for Postler!\n' +
     'You may _accept_ the offer when you\'re leaving,\n' +
     'request the _next_ Postler now if you cannot complete the post,\n' +
     'or _decline_ if there is no need to do the post.', {
-      parse_mode: 'Markdown',
-      reply_markup: {
-        one_time_keyboard: true,
-        resize_keyboard: true,
-        keyboard: [
-          ['/accept'],
-          ['/next', '/decline']
-        ]
-      }
+    parse_mode: 'Markdown',
+    reply_markup: {
+      one_time_keyboard: true,
+      resize_keyboard: true,
+      keyboard: [
+        ['/accept'],
+        ['/next', '/decline']
+      ]
+    }
   });
 };
 
