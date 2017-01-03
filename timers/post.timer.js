@@ -25,7 +25,6 @@ PostTimer.checkAndNotify = function () {
     if(!action){
       return;
     }
-    //Execute given action
     console.info(' -- PostTimer: Changing state from ', post.state, ' to ', expectedState, ' at ', new Date());
     action();
   });
@@ -63,11 +62,7 @@ function determineActionForIdleState(expectedState){
           return console.log(' -- PostTimer: Changed to preparation state.');
         });
       };
-    case STATES.ACTION:
-    case STATES.REMINDER:
-      // If state is currently in IDLE State and nobody was selected
-      // in the preparation state, then we leave it in the IDLE state
-      // --> Nothing to do
+    default:
       return;
   }
 }
@@ -194,9 +189,6 @@ function createDateWithHoursAndMinutes(hours, minutes){
 
 function isWeekend(date) {
   return date.getDay() == /* Saturday */ 6 || date.getDay() == /* Sunday */ 0;
-  // fuck you JavaScript for Sunday being the first day of week,
-  // ISO-8601 says otherwise you're entirely wrong
-  // Actually Js is right with having the sunday == 0, take a closer look at the norm
 }
 
 const FIVE_SECONDS = 1000;
