@@ -85,7 +85,7 @@ bot.onText(/\/next/, function (msg, match) {
         return bot.sendMessage(msg.chat.id, 'You are not the selected Postler');
       }
       PostService.nextZivi(function (err, zivi) {
-        bot.sendMessage(msg.chat.id, 'Selected another zivi');
+        bot.sendMessage(msg.chat.id, zivi.name + ' will carry out the honourable task.');
         PostService.pushPostState();
         TelegramService.sendZiviUpdateToUser(zivi, 'You are the selected postler');
       });
