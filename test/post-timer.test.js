@@ -101,4 +101,25 @@ describe('PostTimer', function () {
       );
     })
   });
+
+
+  describe('from reminder', function () {
+    it('should stay at reminder at 12:00', function () {
+      justCheckFromToExpected(12, 0, STATES.REMINDER, STATES.REMINDER, STATES.IDLE);
+    });
+    it('should move to idle and then preparation at 14:45', function () {
+      justCheckFromToExpected(14, 45, STATES.REMINDER, STATES.IDLE, STATES.PREPARATION);
+      sandbox.restore();
+      justCheckFromToExpected(14, 45, STATES.IDLE, STATES.PREPARATION, STATES.PREPARATION);
+    });
+    it('should move to idle and then preparation at 15:05', function () {
+      justCheckFromToExpected(15, 5, STATES.REMINDER, STATES.PREPARATION, STATES.ACTION);
+    });
+    it('should stay at reminder at 15:15', function () {
+      justCheckFromToExpected(15, 15, STATES.REMINDER, STATES.REMINDER, STATES.REMINDER);
+    });
+    it('should stay at reminder at 17:00', function () {
+      justCheckFromToExpected(17, 0, STATES.REMINDER, STATES.REMINDER, STATES.IDLE);
+    });
+  });
 });

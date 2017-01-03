@@ -50,17 +50,18 @@ function determineAction(date, post, expectedState) {
   return action;
 }
 
+var invokePreparationState = function () {
+  return function () {
+    PostService.startPreparationState(function (err, post) {
+      TelegramService.sendZiviUpdateToUser(post.zivi, 'Congratulations! You are the selected Postler!');
+      return console.log(' -- PostTimer: Changed to preparation state.');
+    });
+  };
+};
 function determineActionForIdleState(expectedState) {
   switch (expectedState) {
     case STATES.PREPARATION:
-      return function () {
-        PostService.startPreparationState(function (err, post) {
-          TelegramService.sendZiviUpdateToUser(post.zivi, 'You are the selected postler');
-          return console.log(' -- PostTimer: Changed to preparation state.');
-        });
-      };
-    default:
-      return;
+      return invokePreparationState();
   }
 }
 
@@ -91,20 +92,15 @@ function isFifteenMinutesOrMoreAgo(now, date) {
 
 function determineActionForReminderState(expectedState) {
   switch (expectedState) {
-    case STATES.ACTION:
-    case STATES.IDLE:
-      return function () {
-        PostService.justSetState(STATES.IDLE, function () {
-          return console.log(' -- PostTimer: Switching from reminder to idle state because who needs the yellow card anyways.');
-        });
-      };
     case STATES.PREPARATION:
       return function () {
-        PostService.startPreparationState(function (post) {
-          TelegramService.sendZiviUpdateToUser(post.zivi, 'You are the selected postler');
-          return console.log(' -- PostTimer: Switching from reminder to preparation state because who needs the yellow card anyways.');
+        PostService.justSetState(STATES.IDLE, function () {
+          return console.log(' -- PostTimer: Temporarily switching from reminder to idle because ' +
+            'the next Postler will retrieve the yellow card anyways.');
         });
       };
+    case STATES.ACTION:
+      return invokePreparationState();
   }
 }
 
