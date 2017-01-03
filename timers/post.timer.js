@@ -61,6 +61,7 @@ var invokePreparationState = function () {
 function determineActionForIdleState(expectedState) {
   switch (expectedState) {
     case STATES.PREPARATION:
+    case STATES.ACTION:
       return invokePreparationState();
   }
 }
