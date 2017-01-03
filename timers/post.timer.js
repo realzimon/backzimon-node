@@ -68,23 +68,8 @@ function determineActionForIdleState(expectedState) {
 }
 
 function determineActionForPrepState(expectedState) {
-  switch (expectedState) {
-    //Expected state change, we credit the user if he did not accept it automatically
-    case STATES.ACTION:
-      return function () {
-        PostService.acceptPost(function (err, zivi) {
-          TelegramService.sendZiviUpdateToUser(zivi, 'You automatically accepted the offer, because you did not respond.');
-          return console.log(' -- PostTimer: Zivi ', zivi.name, ' did not accept the offer, cruelly accepting for them.');
-        });
-      };
-    case STATES.REMINDER:
-    case STATES.IDLE:
-      return function () {
-        PostService.justSetState(STATES.IDLE, function () {
-          return console.log(' -- PostTimer: Preparation state ended without action state being expected.');
-        });
-      };
-  }
+  // never do anything, just wait for somebody to accept, dismiss or reassign the post
+  // it is not safe to assume that the post will actually be done if it is not accepted
 }
 
 function determineActionForActionState(date, expectedState) {

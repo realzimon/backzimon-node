@@ -4,6 +4,7 @@ var sinon = require('sinon');
 var PostService = require('../services/post.service');
 var PostTimer = require('../timers/post.timer');
 var STATES = require('../models/states');
+
 var sandbox;
 beforeEach(function () {
   sandbox = sinon.sandbox.create();
@@ -50,6 +51,24 @@ describe('PostTimer', function () {
     });
     it.skip('should still switch to preparation at 15:05', function () {
       justCheckFromToExpected(15, 5, STATES.IDLE, STATES.PREPARATION, STATES.ACTION);
+    });
+  });
+
+  describe('from preparation', function () {
+    it('should stay at 07:35', function () {
+      justCheckFromToExpected(7, 35, STATES.PREPARATION, STATES.PREPARATION, STATES.IDLE);
+    });
+    it('should stay at 10:50', function () {
+      justCheckFromToExpected(10, 50, STATES.PREPARATION, STATES.PREPARATION, STATES.PREPARATION);
+    });
+    it('should stay at 11:00', function () {
+      justCheckFromToExpected(11, 0, STATES.PREPARATION, STATES.PREPARATION, STATES.ACTION);
+    });
+    it('should stay at 14:50', function () {
+      justCheckFromToExpected(14, 50, STATES.PREPARATION, STATES.PREPARATION, STATES.PREPARATION);
+    });
+    it('should stay at 15:00', function () {
+      justCheckFromToExpected(15, 0, STATES.PREPARATION, STATES.PREPARATION, STATES.ACTION);
     });
   });
 });
