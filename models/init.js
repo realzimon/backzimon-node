@@ -1,5 +1,5 @@
 var fs = require('fs');
-const STATES = require('../config/states');
+const STATES = require('states');
 var models = require('../models/index');
 var quotes = JSON.parse(fs.readFileSync('./config/quotes.json', 'utf8'));
 var zivis = JSON.parse(fs.readFileSync('./config/zivis.json', 'utf8'));

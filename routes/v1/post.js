@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-const STATES = require('../../config/states');
+const STATES = require('../../models/states');
 var PostService = require('../../services/post.service');
 var TelegramService = require('../../services/telegram.service');
 

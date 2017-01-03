@@ -1,6 +1,6 @@
 var PostService = require('./../services/post.service');
 var ZiviService = require('./../services/zivi.service');
-var STATES = require('../config/states');
+var STATES = require('../models/states');
 
 var TelegramBot = require('node-telegram-bot-api');
 var bot = new TelegramBot(' -- insert api key --', {

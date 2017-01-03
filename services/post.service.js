@@ -1,6 +1,6 @@
 var shuffle = require('shuffle-array');
 
-const STATES = require('../config/states');
+const STATES = require('../models/states');
 var models = require('../models/index');
 var ZiviService = require('./zivi.service');
 var SocketService = require('./socket.service');
