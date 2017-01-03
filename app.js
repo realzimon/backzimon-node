@@ -9,8 +9,10 @@ var quotes = require('./routes/v1/quotes');
 var zivis = require('./routes/v1/zivis');
 var post = require('./routes/v1/post');
 require('./timers/zivi.timer.js');
-require('./timers/post.timer.js');
+var PostTimer = require('./timers/post.timer.js');
 require('./services/telegram.service');
+const FIVE_SECONDS = 5 * 1000;
+setInterval(PostTimer.checkAndNotify, FIVE_SECONDS);
 
 var app = express();
 

@@ -31,5 +31,13 @@ npm run db:init
 
 This will remove all previous entries of the database documents (zivis and quotes) and insert the values from the config files. 
 
+## Testing
+
+You can run the test suite using:
+
+```
+npm test
+```
+
 [travis-badge]: https://travis-ci.org/realzimon/backzimon-node.svg?branch=master
 [travis-badge-url]: https://travis-ci.org/realzimon/backzimon-node

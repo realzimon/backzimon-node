@@ -13,30 +13,30 @@ var TIME_FOR_IDLE;
 var PostTimer = {};
 
 PostTimer.checkAndNotify = function () {
-  if (isWeekend(new Date())) {
-    // we're outta here, no work today
-    return;
+  const now = new Date();
+  if (!isWeekend(now)) {
+    PostTimer.checkWithTime(now);
   }
-  initTimes();
-
-  PostService.findCurrentState(function (post) {
-    var expectedState = getStateForTime(new Date());
-    var action = determineAction(post.state, expectedState);
-    if (!action) {
-      return;
-    }
-    console.info(' -- PostTimer: Changing state from', post.state, 'to', expectedState, 'at', new Date());
-    action();
-  });
-
 };
 
-function determineAction(currentState, expectedState) {
-  if (currentState === expectedState) {
+PostTimer.checkWithTime = function (date, callback) {
+  PostService.findCurrentState(function (post) {
+    var expectedState = getStateForTime(date);
+    var action = determineAction(date, post, expectedState);
+    if (action) {
+      console.info(' -- PostTimer: Changing state from', post.state, 'to', expectedState, 'at', date);
+      action();
+    }
+    callback && callback(post, action, expectedState);
+  });
+};
+
+function determineAction(date, post, expectedState) {
+  if (post.state === expectedState) {
     return;
   }
   var action;
-  switch (currentState) {
+  switch (post.state) {
     case STATES.IDLE:
       action = determineActionForIdleState(expectedState);
       break;
@@ -44,7 +44,7 @@ function determineAction(currentState, expectedState) {
       action = determineActionForPrepState(expectedState);
       break;
     case STATES.ACTION:
-      action = determineActionForActionState(expectedState);
+      action = determineActionForActionState(date, expectedState);
       break;
     case STATES.REMINDER:
       action = determineActionForReminderState(expectedState);
@@ -87,7 +87,7 @@ function determineActionForPrepState(expectedState) {
   }
 }
 
-function determineActionForActionState(expectedState) {
+function determineActionForActionState(date, expectedState) {
   switch (expectedState) {
     case STATES.REMINDER:
       return function () {
@@ -161,37 +161,36 @@ function timeForAction(date) {
 function initTimes() {
 
   TIME_FOR_PREP = [
-    createDateWithHoursAndMinutes(10, 45),
-    createDateWithHoursAndMinutes(14, 45)
+    PostTimer.hourMinuteDateToday(10, 45),
+    PostTimer.hourMinuteDateToday(14, 45)
   ];
 
   TIME_FOR_ACTION = [
-    createDateWithHoursAndMinutes(11, 0),
-    createDateWithHoursAndMinutes(15, 0)
+    PostTimer.hourMinuteDateToday(11, 0),
+    PostTimer.hourMinuteDateToday(15, 0)
   ];
 
   TIME_FOR_REMINDER = [
-    createDateWithHoursAndMinutes(11, 15),
-    createDateWithHoursAndMinutes(15, 15)
+    PostTimer.hourMinuteDateToday(11, 15),
+    PostTimer.hourMinuteDateToday(15, 15)
   ];
 
   TIME_FOR_IDLE = [
-    createDateWithHoursAndMinutes(11, 30),
-    createDateWithHoursAndMinutes(15, 30)
+    PostTimer.hourMinuteDateToday(11, 30),
+    PostTimer.hourMinuteDateToday(15, 30)
   ]
 }
 
-function createDateWithHoursAndMinutes(hours, minutes) {
+PostTimer.hourMinuteDateToday = function (hours, minutes) {
   var now = new Date();
   return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0, 0)
-}
+};
 
 function isWeekend(date) {
   return date.getDay() == /* Saturday */ 6 || date.getDay() == /* Sunday */ 0;
 }
 
-const FIVE_SECONDS = 1000;
-setInterval(PostTimer.checkAndNotify, FIVE_SECONDS);
+initTimes();
 PostService.pushPostState();
 
 module.exports = PostTimer;
