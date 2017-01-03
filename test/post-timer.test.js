@@ -1,24 +1,10 @@
+var TestUtils = require('./test.utils.js');
 var assert = require('assert');
-var STATES = require('../models/states');
 var sinon = require('sinon');
-var mongoose = require('mongoose');
-sinon.stub(mongoose);
-mongoose.connection = {
-  on: function () {
-  }
-};
-var ZiviService = require('../services/zivi.service');
-sinon.stub(ZiviService, 'findAll', function () {
-  return [{name: 'lel', post_count: 0}];
-});
 var PostService = require('../services/post.service');
-sinon.stub(PostService, 'pushPostState');
-sinon.stub(PostService, 'attemptSave', function (post, callback) {
-  callback && callback();
-});
 var PostTimer = require('../timers/post.timer');
+var STATES = require('../models/states');
 var sandbox;
-
 beforeEach(function () {
   sandbox = sinon.sandbox.create();
 });
