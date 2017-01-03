@@ -40,7 +40,7 @@ function determineAction(currentState, expectedState) {
     case STATES.IDLE:
       action = determineActionForIdleState(expectedState);
       break;
-    case STATES.PREPERATION:
+    case STATES.PREPARATION:
       action = determineActionForPrepState(expectedState);
       break;
     case STATES.ACTION:
@@ -55,7 +55,7 @@ function determineAction(currentState, expectedState) {
 
 function determineActionForIdleState(expectedState) {
   switch (expectedState) {
-    case STATES.PREPERATION:
+    case STATES.PREPARATION:
       return function () {
         PostService.startPreparationState(function (err, post) {
           TelegramService.sendZiviUpdateToUser(post.zivi, 'You are the selected postler');
@@ -95,7 +95,7 @@ function determineActionForActionState(expectedState) {
           return console.log(' -- PostTimer: Action state could possibly be done, but we don\'t  know, switching to reminder.');
         });
       };
-    case STATES.PREPERATION:
+    case STATES.PREPARATION:
       return function () {
         PostService.findCurrentState(function (post) {
           if ((post.timestamp < TIME_FOR_PREP[0] || post.timestamp >= TIME_FOR_ACTION[0]) && (post.timestamp < TIME_FOR_PREP[1] || post.timestamp >= TIME_FOR_ACTION[1])) {
@@ -124,7 +124,7 @@ function determineActionForReminderState(expectedState) {
           return console.log(' -- PostTimer: Switching from reminder to idle state because who needs the yellow card anyways.');
         });
       };
-    case STATES.PREPERATION:
+    case STATES.PREPARATION:
       return function () {
         PostService.startPreparationState(function (post) {
           TelegramService.sendZiviUpdateToUser(post.zivi, 'You are the selected postler');
@@ -140,7 +140,7 @@ function getStateForTime(date) {
   } else if (timeForAction(date)) {
     return STATES.ACTION;
   } else if (timeForPrep(date)) {
-    return STATES.PREPERATION;
+    return STATES.PREPARATION;
   } else {
     return STATES.REMINDER;
   }

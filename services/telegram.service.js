@@ -57,7 +57,7 @@ bot.onText(/\/accept/, function(msg, match){
     return bot.sendMessage(msg.chat.id, 'This account is not initialized with this bot, for more info type /help');
   }
   PostService.findCurrentState(function(post){
-    if(post.state !== STATES.PREPERATION){
+    if(post.state !== STATES.PREPARATION){
       return bot.sendMessage(msg.chat.id, 'Post is not in preparing state');
     }
     if(!post.zivi || post.zivi.chat !== msg.chat.id){
@@ -76,7 +76,7 @@ bot.onText(/\/next/, function(msg, match){
     return bot.sendMessage(msg.chat.id, 'This account is not initialized with this bot, for more info type /help');
   }
   PostService.findCurrentState(function(post){
-    if(post.state !== STATES.PREPERATION){
+    if(post.state !== STATES.PREPARATION){
       return bot.sendMessage(msg.chat.id, 'Post is not in preparing state');
     }
     if(!post.zivi || post.zivi.chat !== msg.chat.id){

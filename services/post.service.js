@@ -47,7 +47,7 @@ PostService.justSetState = function (state, callback) {
 
 PostService.acceptPost = function (callback) {
   PostService.findCurrentState(function (post) {
-    if (post.state !== STATES.PREPERATION) {
+    if (post.state !== STATES.PREPARATION) {
       return callback && callback('Can only accept in preparation state, is: ' + post.state);
     }
     PostService.setStateOn(post, STATES.ACTION, function (err, post) {
@@ -88,7 +88,7 @@ PostService.dismissReminder = function (callback) {
 
 PostService.nextZivi = function (callback) {
   PostService.findCurrentState(function (post) {
-    if (post.state !== STATES.PREPERATION) {
+    if (post.state !== STATES.PREPARATION) {
       return callback && callback('Expected preparation state, but is: ' + post.state);
     }
     PostService.selectPostlerFairly(post, callback);
@@ -125,7 +125,7 @@ PostService.selectPostlerFairly = function (post, callback) {
 
 PostService.startReminderState = function (callback) {
   PostService.findCurrentState(function (post) {
-    if (post.state !== STATES.ACTION && post.state !== STATES.PREPERATION) {
+    if (post.state !== STATES.ACTION && post.state !== STATES.PREPARATION) {
       return callback && callback('Invalid state, is: ' + post.state);
     } else {
       PostService.setStateOn(post, STATES.REMINDER, callback);
@@ -135,7 +135,7 @@ PostService.startReminderState = function (callback) {
 
 PostService.startPreparationState = function (callback) {
   PostService.findCurrentState(function (post) {
-    post.state = STATES.PREPERATION;
+    post.state = STATES.PREPARATION;
     PostService.selectPostlerFairly(post, callback);
   });
 };
