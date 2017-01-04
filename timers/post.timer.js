@@ -96,11 +96,7 @@ function determineActionForActionState(date, post, expectedState) {
       });
     };
   } else if (expectedState === STATES.PREPARATION) {
-    return function () {
-      PostService.justSetState(STATES.IDLE, function () {
-        return console.log('-- PostTimer: Temporarily switching to idle to invoke new preparation.');
-      });
-    };
+    return invokePreparationState();
   }
 }
 
