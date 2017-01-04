@@ -20,6 +20,7 @@ PostTimer.checkAndNotify = function () {
 };
 
 PostTimer.checkWithTime = function (date, callback) {
+  initTimes();
   PostService.findCurrentState(function (post) {
     var expectedState = getStateForTime(date);
     var action = determineAction(date, post, expectedState);
