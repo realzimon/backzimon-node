@@ -42,7 +42,7 @@ router.put('/', function (req, res) {
   switch (action) {
     case 'next':
       PostService.nextZivi(function(err, post){
-        TelegramService.sendZiviUpdateToUser(post.zivi, 'You are the selected postler!')
+        TelegramService.sendPostlerPromptTo(post.zivi);
         return res.json();
       });
       break;

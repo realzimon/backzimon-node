@@ -87,7 +87,7 @@ bot.onText(/\/next/, function (msg, match) {
       PostService.nextZivi(function (err, post) {
         bot.sendMessage(msg.chat.id, post.zivi.name + ' will carry out the honourable task.');
         PostService.pushPostState();
-        TelegramService.sendZiviUpdateToUser(post.zivi, 'You are the selected postler');
+        TelegramService.sendPostlerPromptTo(post.zivi);
       });
     });
   });
