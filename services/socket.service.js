@@ -6,6 +6,7 @@ if (process.env.zimonTest) {
       //no-op for tests
     }
   };
+  return;
 }
 
 var io = require('socket.io')(ConfigService.getSocketPort());
