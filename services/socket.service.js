@@ -1,15 +1,24 @@
 var ConfigService = require('./config.service');
+
+if (process.env.zimonTest) {
+  module.exports = {
+    writeToSocket: function (channel, data) {
+      //no-op for tests
+    }
+  };
+}
+
 var io = require('socket.io')(ConfigService.getSocketPort());
 
 var SocketService = {};
 
-SocketService.getSocket = function () {
+function getSocket() {
   //noinspection JSUnresolvedVariable
   return io.sockets;
-};
+}
 
 SocketService.writeToSocket = function (channel, data) {
-  SocketService.getSocket().emit(channel, data);
+  getSocket().emit(channel, data);
 };
 
 module.exports = SocketService;

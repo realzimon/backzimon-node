@@ -17,7 +17,6 @@ sinon.stub(ZiviService, 'findAll', function (callback) {
 });
 
 var PostService = require('../services/post.service.js');
-sinon.stub(PostService, 'pushPostState');
 sinon.stub(PostService, 'attemptSave', function (post, callback) {
   callback && callback(null, post);
 });
