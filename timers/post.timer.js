@@ -20,7 +20,7 @@ PostTimer.checkAndNotify = function () {
 };
 
 PostTimer.checkWithTime = function (date, callback) {
-  initTimes();
+  initTimes(date);
   PostService.findCurrentState(function (post) {
     var expectedState = getStateForTime(date);
     var action = determineAction(date, post, expectedState);
@@ -140,35 +140,38 @@ function timeForAction(date) {
   return (date >= TIME_FOR_ACTION[0] && date < TIME_FOR_REMINDER[0]) || (date >= TIME_FOR_ACTION[1] && date < TIME_FOR_REMINDER[1]);
 }
 
-function initTimes() {
+function initTimes(date) {
   TIME_FOR_PREP = [
-    PostTimer.hourMinuteDateToday(10, 45),
-    PostTimer.hourMinuteDateToday(14, 45)
+    PostTimer.hourMinuteDateOnDate(date, 10, 45),
+    PostTimer.hourMinuteDateOnDate(date, 14, 45)
   ];
   TIME_FOR_ACTION = [
-    PostTimer.hourMinuteDateToday(11, 0),
-    PostTimer.hourMinuteDateToday(15, 0)
+    PostTimer.hourMinuteDateOnDate(date, 11, 0),
+    PostTimer.hourMinuteDateOnDate(date, 15, 0)
   ];
   TIME_FOR_REMINDER = [
-    PostTimer.hourMinuteDateToday(11, 15),
-    PostTimer.hourMinuteDateToday(15, 15)
+    PostTimer.hourMinuteDateOnDate(date, 11, 15),
+    PostTimer.hourMinuteDateOnDate(date, 15, 15)
   ];
   TIME_FOR_IDLE = [
-    PostTimer.hourMinuteDateToday(11, 30),
-    PostTimer.hourMinuteDateToday(15, 30)
+    PostTimer.hourMinuteDateOnDate(date, 11, 30),
+    PostTimer.hourMinuteDateOnDate(date, 15, 30)
   ];
 }
 
 PostTimer.hourMinuteDateToday = function (hours, minutes) {
-  var now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0, 0)
+  return PostTimer.hourMinuteDateOnDate(new Date(), hours, minutes);
+};
+
+PostTimer.hourMinuteDateOnDate = function (initial, hours, minutes) {
+  return new Date(initial.getFullYear(), initial.getMonth(), initial.getDate(), hours, minutes, 0, 0)
 };
 
 function isWeekend(date) {
   return date.getDay() == /* Saturday */ 6 || date.getDay() == /* Sunday */ 0;
 }
 
-initTimes();
+initTimes(new Date());
 PostService.pushPostState();
 
 module.exports = PostTimer;

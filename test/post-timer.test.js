@@ -55,8 +55,22 @@ describe('PostTimer', function () {
       justCheckFromToExpected(15, 5, STATES.IDLE, STATES.PREPARATION, STATES.ACTION);
     });
     it('should not re-enter preparation state if last change is less than 15 minutes ago', function () {
-      const fourteenMinutesAgo = new Date(new Date() - 14 * 60 * 1000);
-      justCheckFromToExpected(10, 45, STATES.IDLE, STATES.IDLE, STATES.PREPARATION, fourteenMinutesAgo);
+      const timeToday = PostTimer.hourMinuteDateToday(10, 45);
+      const fourteenMinutesEarlier = new Date(timeToday - 14 * 60 * 1000);
+      justCheckFromToExpected(10, 45, STATES.IDLE, STATES.IDLE, STATES.PREPARATION, fourteenMinutesEarlier);
+    });
+    it('should have today\'s state thresholds even if the date is different from the day the timer was initialised at', function () {
+      const timeToday = PostTimer.hourMinuteDateToday(14, 46);
+      const timeYesterday = new Date(timeToday - 24 * 60 * 60 * 1000);
+      const twentyMinutesAgoYesterday = new Date(timeYesterday - 20 * 60 * 1000);
+      mockPost(STATES.IDLE, twentyMinutesAgoYesterday);
+      PostTimer.checkWithTime(
+        timeYesterday,
+        function (post, action, expected) {
+          assert.equal(expected, STATES.PREPARATION, 'expected state');
+          assert.equal(post.state, STATES.PREPARATION, 'final state');
+        }
+      );
     });
   });
 
