@@ -117,6 +117,22 @@ bot.onText(/\/cancel/, function (msg, match) {
   });
 });
 
+bot.onText(/\/dismiss/, function (msg, match) {
+  checkAccountInitialisedOrFail(msg, function (init) {
+    PostService.findCurrentState(function(post){
+      if(post.state !== STATES.REMINDER){
+        return bot.sendMessage(msg.chat.id, 'It\'s not time yet. Have a little patience.');
+      }
+      if(post.zivi.chat !== msg.chat.id){
+        return bot.sendMessage(msg.chat.id, 'El Señor Chefzimon has *not* asked you to return the yellow card. Please do not annoy him again.');
+      }
+      PostService.dismissReminder(function(){
+        return bot.sendMessage(msg.chat.id, 'El Señor Chefzimon is not convinced yet. He is watching you.');
+      });
+    });
+  });
+});
+
 TelegramService.sendZiviUpdateToUser = function (zivi, message) {
   if (!zivi.chat || zivi.chat === -1) {
     return console.log(' ## No Telegram chat for', zivi.name);
@@ -139,6 +155,24 @@ TelegramService.sendPostlerPromptTo = function (zivi) {
       keyboard: [
         ['/accept'],
         ['/next', '/cancel']
+      ]
+    }
+  });
+};
+
+TelegramService.sendYellowCardReminder = function(zivi){
+  if (!zivi.chat || zivi.chat === -1) {
+    return console.log(' ## No Telegram chat for', zivi.name);
+  }
+  bot.sendMessage(zivi.chat, 'El Señor Chefzimon assumes that you have already returned ' +
+    'the yellow card like a responsible adult. Type /dismiss to swear to ' +
+    'the sacred GNU General Public License.', {
+    parse_mode: 'Markdown',
+    reply_markup: {
+      one_time_keyboard: true,
+      resize_keyboard: true,
+      keyboard: [
+        ['/dismiss']
       ]
     }
   });

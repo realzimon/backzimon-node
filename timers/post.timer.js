@@ -91,7 +91,10 @@ function determineActionForActionState(date, post, expectedState) {
   var stateStartedMoreThan15MinutesAgo = isFifteenMinutesOrMoreAgo(date, post.timestamp);
   if (isTimestampInFutureAndLogError(date, post) || stateStartedMoreThan15MinutesAgo) {
     return function () {
-      PostService.startReminderState(function () {
+      PostService.startReminderState(function (err, post) {
+        if(!err){
+          TelegramService.sendYellowCardReminder(post.zivi);
+        }
         return console.log(' -- PostTimer: Action state could possibly be done, but we don\'t  know, switching to reminder.');
       });
     };
