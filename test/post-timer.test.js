@@ -130,5 +130,10 @@ describe('PostTimer', function () {
     it('should stay at reminder at 17:00', function () {
       justCheckFromToExpected(17, 0, STATES.REMINDER, STATES.REMINDER, STATES.IDLE);
     });
+    it('should not leave reminder state if last change is <15m ago', function () {
+      const timeToday = PostTimer.hourMinuteDateToday(14, 50);
+      const fourteenMinutesEarlier = new Date(timeToday - 14 * 60 * 1000);
+      justCheckFromToExpected(14, 50, STATES.REMINDER, STATES.REMINDER, STATES.PREPARATION, fourteenMinutesEarlier);
+    });
   });
 });

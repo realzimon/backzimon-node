@@ -45,7 +45,7 @@ function determineAction(date, post, expectedState) {
       action = determineActionForActionState(date, post, expectedState);
       break;
     case STATES.REMINDER:
-      action = determineActionForReminderState(expectedState);
+      action = determineActionForReminderState(date, post, expectedState);
       break;
   }
   return action;
@@ -105,11 +105,13 @@ function isFifteenMinutesOrMoreAgo(now, date) {
   return (now - date) >= 15 * 60 * 1000;
 }
 
-function determineActionForReminderState(expectedState) {
-  switch (expectedState) {
-    case STATES.PREPARATION:
-    case STATES.ACTION:
-      return invokePreparationState();
+function determineActionForReminderState(date, post, expectedState) {
+  if (isFifteenMinutesOrMoreAgo(date, post.timestamp)) {
+    switch (expectedState) {
+      case STATES.PREPARATION:
+      case STATES.ACTION:
+        return invokePreparationState();
+    }
   }
 }
 
