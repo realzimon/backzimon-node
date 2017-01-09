@@ -106,7 +106,11 @@ describe('PostTimer', function () {
       const date = PostTimer.hourMinuteDateToday(11, 5);
       const fifteenMinutesAgo = new Date(date - 15 * 60 * 1000);
       justCheckFromToExpected(11, 5, STATES.ACTION, STATES.REMINDER, STATES.ACTION, fifteenMinutesAgo);
-    })
+    });
+    it('should not switch back to action from preparation', function () {
+      const date = PostTimer.hourMinuteDateToday(10, 50);
+      justCheckFromToExpected(10, 50, STATES.ACTION, STATES.ACTION, STATES.PREPARATION, date);
+    });
   });
 
 
