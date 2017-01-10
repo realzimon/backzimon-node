@@ -12,4 +12,8 @@ TelegramService.sendPostlerPromptTo = function (zivi) {
 
 };
 
+TelegramService.sendYellowCardReminder = function (zivi) {
+
+};
+
 module.exports = TelegramService;
