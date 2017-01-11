@@ -9,10 +9,17 @@ var quotes = require('./routes/v1/quotes');
 var zivis = require('./routes/v1/zivis');
 var post = require('./routes/v1/post');
 require('./timers/zivi.timer.js');
-var PostTimer = require('./timers/post.timer.js');
 require('./services/telegram.service');
+
+var PostTimer = require('./timers/post.timer.js');
 const FIVE_SECONDS = 5 * 1000;
 setInterval(PostTimer.checkAndNotify, FIVE_SECONDS);
+
+var FladeService = require('./services/flade.service');
+const ONE_DAY = 86400 * 1000;
+setInterval(FladeService.getAndSaveCurrentFlade, ONE_DAY);
+//Calling it once to get the current flade on restart
+FladeService.getAndSaveCurrentFlade();
 
 var app = express();
 

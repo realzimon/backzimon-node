@@ -38,10 +38,16 @@ var Post = mongoose.model('post', mongoose.Schema({
   zivi: Object
 }));
 
+var Flade = mongoose.model('flade', mongoose.Schema({
+  text: String,
+  timestamp: Date
+}));
+
 var models = {
   Quote: Quote,
   Zivi: Zivi,
-  Post: Post
+  Post: Post,
+  Flade: Flade
 };
 
 module.exports = models;
