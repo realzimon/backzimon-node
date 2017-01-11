@@ -41,7 +41,7 @@ function updateFlade(callback){
           timestamp: new Date()
         });
         flade.save(function(err, flade){
-          callback(flade);
+          callback && callback(flade);
         });
       });
     });
@@ -78,7 +78,7 @@ function parseContentToFlade(content, callback){
 
 FladeService.getCurrentFlade = function(callback){
   models.Flade.findOne({}).then(function(flade){
-    callback(flade);
+    callback && callback(flade);
   })
 };
 
