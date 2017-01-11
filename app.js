@@ -8,6 +8,8 @@ var bodyParser = require('body-parser');
 var quotes = require('./routes/v1/quotes');
 var zivis = require('./routes/v1/zivis');
 var post = require('./routes/v1/post');
+var flade = require('./routes/v1/flade');
+
 require('./timers/zivi.timer.js');
 require('./services/telegram.service');
 
@@ -42,6 +44,7 @@ app.use(function (req, res, next) {
 app.use('/api/v1/quotes', quotes);
 app.use('/api/v1/zivis', zivis);
 app.use('/api/v1/post', post);
+app.use('/api/v1/flade', flade);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
