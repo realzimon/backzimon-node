@@ -21,7 +21,9 @@ var FladeService = require('./services/flade.service');
 const ONE_DAY = 86400 * 1000;
 setInterval(FladeService.getAndSaveCurrentFlade, ONE_DAY);
 //Calling it once to get the current flade on restart
-FladeService.getAndSaveCurrentFlade();
+FladeService.getAndSaveCurrentFlade(function(flade){
+  console.log('Setting flade of the day', flade);
+});
 
 var app = express();
 

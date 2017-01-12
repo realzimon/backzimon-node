@@ -36,13 +36,7 @@ function updateFlade(callback){
     });
     res.on('end', function(){
       parseContentToFlade(content, function(result){
-        var flade = new models.Flade({
-          text: result,
-          timestamp: new Date()
-        });
-        flade.save(function(err, flade){
-          callback(flade);
-        });
+        updateCurrentFlade(result, callback);
       });
     });
   });
@@ -74,6 +68,18 @@ function parseContentToFlade(content, callback){
 
   Parser.write(content);
   Parser.end();
+}
+
+function updateCurrentFlade(text, callback){
+  models.Flade.remove({}, function(){
+    var flade = new models.Flade({
+      text: text,
+      timestamp: new Date()
+    });
+    flade.save(function(err, flade){
+      callback(flade);
+    });
+  });
 }
 
 FladeService.getCurrentFlade = function(callback){
