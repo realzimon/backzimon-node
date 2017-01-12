@@ -36,7 +36,17 @@ function updateFlade(callback){
     });
     res.on('end', function(){
       parseContentToFlade(content, function(result){
+<<<<<<< HEAD
         updateCurrentFlade(result, callback);
+=======
+        var flade = new models.Flade({
+          text: result,
+          timestamp: new Date()
+        });
+        flade.save(function(err, flade){
+          callback && callback(flade);
+        });
+>>>>>>> 08534a09fe73e1255a4b6fb23cab31625be27cc6
       });
     });
   });
@@ -84,7 +94,7 @@ function updateCurrentFlade(text, callback){
 
 FladeService.getCurrentFlade = function(callback){
   models.Flade.findOne({}).then(function(flade){
-    callback(flade);
+    callback && callback(flade);
   })
 };
 
