@@ -77,7 +77,7 @@ function updateCurrentFlade(text, callback){
       timestamp: new Date()
     });
     flade.save(function(err, flade){
-      callback(flade);
+      callback && callback(flade);
     });
   });
 }
