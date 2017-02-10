@@ -12,10 +12,15 @@ var flade = require('./routes/v1/flade');
 
 require('./timers/zivi.timer.js');
 require('./services/telegram.service');
+var NetUsageService = require('./services/netusage.service');
+
+setInterval(NetUsageService.loadAndPushNetUsage, 1000);
 
 var PostTimer = require('./timers/post.timer.js');
 const FIVE_SECONDS = 5 * 1000;
 setInterval(PostTimer.checkAndNotify, FIVE_SECONDS);
+
+
 
 var FladeService = require('./services/flade.service');
 const ONE_DAY = 86400 * 1000;
