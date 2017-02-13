@@ -29,7 +29,8 @@ var Zivi = mongoose.model('zivi', mongoose.Schema({
   picture: String,
   first: Number,
   order: Number,
-  chat: Number
+  chat: Number,
+  addresses: Array
 }));
 
 var Post = mongoose.model('post', mongoose.Schema({

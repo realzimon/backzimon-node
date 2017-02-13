@@ -5,7 +5,11 @@
     "color": "light-blue",
     "colorHex": "#03a9f4",
     "picture": "zivis/dominik.jpg",
-    "post": 16
+    "post": 16,
+    "addresses": [
+      "44:00:10:1e:bb:e6",
+      "b8:e8:56:41:74:3c"
+    ]
   },
   {
     "name": "Philipp",
@@ -13,7 +17,11 @@
     "color": "teal",
     "colorHex": "#009688",
     "picture": "zivis/philipp.jpg",
-    "post": 8
+    "post": 8,
+    "addresses": [
+      "00:db:df:1b:4b:76",
+      "5c:f9:dd:49:62:81"
+    ]
   },
   {
     "name": "Thomas",
@@ -21,7 +29,12 @@
     "color": "red",
     "colorHex": "#f44336",
     "picture": "zivis/thomas.jpg",
-    "post": 17
+    "post": 17,
+    "addresses": [
+      "4c:eb:42:0a:00:dc",
+      "d0:65:ca:59:85:0d",
+      "00:0c:29:fe:89:66"
+    ]
   },
   {
     "name": "Peter",
@@ -29,7 +42,10 @@
     "color": "orange",
     "colorHex": "#ff9800",
     "picture": "zivis/peter.jpg",
-    "post": 5
+    "post": 5,
+    "addresses": [
+      "00:21:cc:6a:61:f0"
+    ]
   },
   {
     "name": "Daniel",
@@ -37,6 +53,10 @@
     "color": "pink",
     "colorHex": "#e91e63",
     "picture": "zivis/daniel.jpg",
-    "post": 8
+    "post": 8,
+    "addresses": [
+      "f8:16:54:90:44:b2",
+      "90:e7:c4:cb:c5:55"
+    ]
   }
 ]
