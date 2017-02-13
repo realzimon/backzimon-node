@@ -106,7 +106,8 @@ function handleValues(values) {
     resultsToPush.push({
       hostname: data[k][1][0],
       download: data[k][1][3],
-      upload: data[k][1][4]
+      upload: data[k][1][4],
+      mac: data[k][1][1]
     })
   }
 
