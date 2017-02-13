@@ -14,10 +14,10 @@ require('./timers/zivi.timer.js');
 require('./services/telegram.service');
 var NetUsageService = require('./services/netusage.service');
 
-setInterval(NetUsageService.loadAndPushNetUsage, 2000);
+const FIVE_SECONDS = 5 * 1000;
+setInterval(NetUsageService.loadAndPushNetUsage, FIVE_SECONDS);
 
 var PostTimer = require('./timers/post.timer.js');
-const FIVE_SECONDS = 5 * 1000;
 setInterval(PostTimer.checkAndNotify, FIVE_SECONDS);
 
 
