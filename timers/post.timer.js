@@ -2,7 +2,6 @@ var shuffle = require('shuffle-array');
 const STATES = require('../models/states');
 var models = require('../models/index');
 var PostService = require('./../services/post.service');
-var ZiviService = require('./../services/zivi.service');
 var TelegramService = require('./../services/telegram.service');
 
 var TIME_FOR_PREP;
@@ -42,7 +41,7 @@ function determineAction(date, post, expectedState) {
       action = determineActionForPrepState(expectedState);
       break;
     case STATES.ACTION:
-      action = determineActionForActionState(date, post, expectedState);
+      action = determineActionForActionState(date, post);
       break;
     case STATES.REMINDER:
       action = determineActionForReminderState(date, post, expectedState);
@@ -87,7 +86,7 @@ function determineActionForPrepState(expectedState) {
   // it is not safe to assume that the post will actually be done if it is not accepted
 }
 
-function determineActionForActionState(date, post, expectedState) {
+function determineActionForActionState(date, post) {
   var stateStartedMoreThan15MinutesAgo = isFifteenMinutesOrMoreAgo(date, post.timestamp);
   if (isTimestampInFutureAndLogError(date, post) || stateStartedMoreThan15MinutesAgo) {
     return function () {
@@ -167,7 +166,7 @@ PostTimer.hourMinuteDateOnDate = function (initial, hours, minutes) {
 };
 
 function isWeekend(date) {
-  return date.getDay() == /* Saturday */ 6 || date.getDay() == /* Sunday */ 0;
+  return date.getDay() === /* Saturday */ 6 || date.getDay() === /* Sunday */ 0;
 }
 
 initTimes(new Date());

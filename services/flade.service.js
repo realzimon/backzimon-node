@@ -41,7 +41,6 @@ function parseContentToFlade(content, callback) {
   var berggasse = false;
   var tagesflade = false;
   var Parser = new htmlparser.Parser({
-
     onopentag: function (name, attribs) {
       if (name === 'a' && attribs.href.indexOf('berggasse') !== -1) {
         berggasse = true;

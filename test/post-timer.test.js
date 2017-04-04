@@ -4,12 +4,15 @@ var sinon = require('sinon');
 var PostService = require('../services/post.service');
 var PostTimer = require('../timers/post.timer');
 var STATES = require('../models/states');
+var mocha = require("mocha");
+var describe = mocha.describe;
+var it = mocha.it;
 
 var sandbox;
-beforeEach(function () {
+mocha.beforeEach(function () {
   sandbox = sinon.sandbox.create();
 });
-afterEach(function () {
+mocha.afterEach(function () {
   sandbox.restore();
 });
 

@@ -6,7 +6,7 @@ var quotes = JSON.parse(fs.readFileSync('./config/quotes.json', 'utf8'));
 var zivis = JSON.parse(fs.readFileSync('./config/zivis.json', 'utf8'));
 
 async.parallel({
-  initQoutes: function(callback){
+  initQuotes: function (callback) {
     models.Quote.remove({}, function(){
       console.log('Removed all quote entries');
       //Insert each element from the quotes config file
