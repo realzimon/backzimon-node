@@ -7,7 +7,7 @@ const FladeService = {};
 
 FladeService.findFlade = function (callback) {
   FladeService.getCachedFlade(function (flade) {
-    if (flade && !isTwoHoursOrMoreAgo(new Date(flade.timestamp))) {
+    if (flade && !isThirtyMinutesOrMoreAgo(new Date(flade.timestamp))) {
       callback && callback(flade);
     } else {
       retrieveFlade(callback)
@@ -15,8 +15,8 @@ FladeService.findFlade = function (callback) {
   });
 };
 
-function isTwoHoursOrMoreAgo(date) {
-  return (new Date() - date) >= 2 * 60 * 60 * 1000;
+function isThirtyMinutesOrMoreAgo(date) {
+  return (new Date() - date) >= 30 * 60 * 1000;
 }
 
 function retrieveFlade(callback) {
