@@ -4,7 +4,7 @@ var router = express.Router();
 var FladeService = require('../../services/flade.service');
 
 router.get('/', function (req, res) {
-  FladeService.getCurrentFlade(function(flade){
+  FladeService.findFlade(function (flade) {
     return res.json(flade);
   });
 });

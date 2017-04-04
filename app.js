@@ -20,16 +20,6 @@ setInterval(NetUsageService.loadAndPushNetUsage, FIVE_SECONDS);
 var PostTimer = require('./timers/post.timer.js');
 setInterval(PostTimer.checkAndNotify, FIVE_SECONDS);
 
-
-
-var FladeService = require('./services/flade.service');
-const ONE_DAY = 86400 * 1000;
-setInterval(FladeService.getAndSaveCurrentFlade, ONE_DAY);
-//Calling it once to get the current flade on restart
-FladeService.getAndSaveCurrentFlade(function(flade){
-  console.log('Setting flade of the day', flade);
-});
-
 var app = express();
 
 // view engine setup
