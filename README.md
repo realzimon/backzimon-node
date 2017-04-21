@@ -15,7 +15,7 @@ npm install -g nodemon # if you do not already have it
 node nodemon
 ```
 
-##Initialise the Database
+## Initialise the Database
 
 Connect to your mongoDB instance and create the database: zimon
 
