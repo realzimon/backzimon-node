@@ -5,6 +5,8 @@ const NetUsageService = {};
 
 var oldDate, oldValues = [];
 
+var errCounter = 0;
+
 NetUsageService.loadAndPushNetUsage = function(){
 
   loadWebsite(function(content){
@@ -24,6 +26,11 @@ function loadWebsite(cb){
     host: '192.168.1.1',
     path: '/usage/live.html'
   }, function(res){
+    if (res.statusCode !== 200) {
+      errWithRateLimit('Failed to retrieve net usage:', res);
+      res.resume();
+      return;
+    }
     var content = '';
     res.setEncoding('utf8');
     res.on('data', function (chunk) {
@@ -32,7 +39,19 @@ function loadWebsite(cb){
     res.on('end', function(){
       return cb && cb(content);
     });
+  }).on('error', function (err) {
+    errWithRateLimit('Failed to retrieve net usage..', err);
   });
+}
+
+function errWithRateLimit(msg, err) {
+  errCounter++;
+  if (errCounter < 2) {
+    console.error(msg, err);
+  } else if (errCounter > 10) {
+    errCounter = 0;
+    console.error(msg, err, 'and 8 more...');
+  }
 }
 
 function matchWebSite(content){
