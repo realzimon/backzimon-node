@@ -11,16 +11,10 @@ router.get('/', function (req, res) {
   });
 });
 
-function orRespond(res, status, message) {
-  return function (err) {
-    if (err) {
-      return res.status(status).json({
-        err: message ? message : err
-      });
-    } else {
-      return res.json();
-    }
-  };
+function logZivi(post) {
+  if (post.zivi) {
+    console.log(' -- postler:', post.zivi.name);
+  }
 }
 
 //noinspection JSUnresolvedFunction
@@ -38,26 +32,29 @@ router.put('/', function (req, res) {
       err: 'No action given'
     });
   }
-  console.log(' -- post action: ' + action);
+  console.log(' -- post action:', action);
   switch (action) {
     case 'next':
-      PostService.nextZivi(function(err, post){
+      PostService.nextZivi(function (err, post) {
         TelegramService.sendPostlerPromptTo(post.zivi);
+        logZivi(post);
         return res.json();
       });
       break;
     case 'accepted':
-      PostService.acceptPost(function(){
+      PostService.acceptPost(function (err, post) {
+        logZivi(post);
         return res.json();
       });
       break;
     case 'cancel':
-      PostService.justSetState(STATES.IDLE, function(){
+      PostService.justSetState(STATES.IDLE, function () {
         return res.json();
       });
       break;
     case 'dismiss-reminder':
-      PostService.dismissReminder(function(){
+      PostService.dismissReminder(function (err, post) {
+        logZivi(post);
         return res.json();
       });
       break;
