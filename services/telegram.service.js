@@ -16,7 +16,7 @@ var bot = new TelegramBot(apiKey, {
   polling: true
 });
 
-bot.onText(/\/start/, function (msg, match) {
+bot.onText(/\/start/, function (msg) {
   return bot.sendMessage(msg.chat.id, 'Hello, it me, El Señor Chefzimon.\n' +
     'First and foremost, if you have no idea what this is, please kindly leave. I dislike strangers.\n' +
     'If you are authorised by the authorities to communicate with me, kindly tell me your registered ' +
@@ -24,7 +24,7 @@ bot.onText(/\/start/, function (msg, match) {
     'If you require assistance, type /help and I will silently ignore your request but print a standardised message.');
 });
 
-bot.onText(/\/help/, function (msg, match) {
+bot.onText(/\/help/, function (msg) {
   return bot.sendMessage(msg.chat.id, 'My name is El Señor Chefzimon.\n' +
     'I can (but would prefer not to) do these amazing things:\n' +
     '/init <first name> - Registers your account with me\n' +
@@ -51,9 +51,9 @@ bot.onText(/\/init (.+)/, function (msg, match) {
   });
 });
 
-bot.onText(/\/postler/, function (msg, match) {
+bot.onText(/\/postler/, function (msg) {
 
-  checkAccountInitialisedOrFail(msg, function (init) {
+  checkAccountInitialisedOrFail(msg, function () {
     PostService.findCurrentState(function (post) {
       if (post.state === STATES.IDLE || !post.zivi) {
         return bot.sendMessage(msg.chat.id, 'Nobody has been selected yet. Stay alert.');
@@ -64,9 +64,9 @@ bot.onText(/\/postler/, function (msg, match) {
 
 });
 
-bot.onText(/\/accept/, function (msg, match) {
-  checkAccountInitialisedOrFail(msg, function (init) {
-    findPostAndCheckPreconditions(msg, function (err, post) {
+bot.onText(/\/accept/, function (msg) {
+  checkAccountInitialisedOrFail(msg, function () {
+    findPostAndCheckPreconditions(msg, function (err) {
       if (err) {
         return bot.sendMessage(msg.chat.id, err);
       } else {
@@ -81,9 +81,9 @@ bot.onText(/\/accept/, function (msg, match) {
   });
 });
 
-bot.onText(/\/next/, function (msg, match) {
-  checkAccountInitialisedOrFail(msg, function (init) {
-    findPostAndCheckPreconditions(msg, function (err, post) {
+bot.onText(/\/next/, function (msg) {
+  checkAccountInitialisedOrFail(msg, function () {
+    findPostAndCheckPreconditions(msg, function (err) {
       if (err) {
         return bot.sendMessage(msg.chat.id, err);
       } else {
@@ -97,8 +97,8 @@ bot.onText(/\/next/, function (msg, match) {
   });
 });
 
-bot.onText(/\/cancel/, function (msg, match) {
-  checkAccountInitialisedOrFail(msg, function (init) {
+bot.onText(/\/cancel/, function (msg) {
+  checkAccountInitialisedOrFail(msg, function () {
     findPostAndCheckPreconditions(msg, function (err, post) {
       if (err) {
         return bot.sendMessage(msg.chat.id, err);
@@ -117,8 +117,8 @@ bot.onText(/\/cancel/, function (msg, match) {
   });
 });
 
-bot.onText(/\/dismiss/, function (msg, match) {
-  checkAccountInitialisedOrFail(msg, function (init) {
+bot.onText(/\/dismiss/, function (msg) {
+  checkAccountInitialisedOrFail(msg, function () {
     PostService.findCurrentState(function(post){
       if(post.state !== STATES.REMINDER){
         return bot.sendMessage(msg.chat.id, 'It\'s not time yet. Have a little patience.');
@@ -128,6 +128,23 @@ bot.onText(/\/dismiss/, function (msg, match) {
       }
       PostService.dismissReminder(function(){
         return bot.sendMessage(msg.chat.id, 'El Señor Chefzimon is not convinced yet. He is watching you.');
+      });
+    });
+  });
+});
+
+bot.onText(/\/volunteer/, function (msg) {
+  checkAccountInitialisedOrFail(msg, function (senderZivi) {
+    PostService.findCurrentState(function (post) {
+      if (post.state === STATES.ACTION) {
+        return bot.sendMessage(msg.chat.id, 'Somebody else is currently doing the post, so idk what you\'re doing');
+      }
+      if (post.zivi.chat === msg.chat.id) {
+        return bot.sendMessage(msg.chat.id, 'You are already the assigned Postler. El Señor will not repeat himself again.');
+      }
+      PostService.forcePostler(senderZivi, function () {
+        bot.sendMessage(msg.chat.id, 'This is your life now');
+        TelegramService.sendPostlerPromptTo(post.zivi);
       });
     });
   });
@@ -181,14 +198,14 @@ TelegramService.sendYellowCardReminder = function(zivi){
 function checkAccountInitialisedOrFail(msg, callback) {
   var chatId = msg.chat.id;
   ZiviService.findAll(function (zivis) {
-    var init = false;
+    var senderZivi = false;
     zivis.forEach(function (zivi) {
       if (zivi.chat === chatId) {
-        init = true;
+        senderZivi = zivi;
       }
     });
-    if (init) {
-      callback(init);
+    if (senderZivi) {
+      callback(senderZivi);
     } else {
       return bot.sendMessage(msg.chat.id, 'You have not yet registered with the El Señor Chefzimon Telegram Integration. ' +
         'Type /help for more information.');
