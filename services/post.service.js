@@ -6,7 +6,6 @@ var ZiviService = require('./zivi.service');
 var SocketService = require('./socket.service');
 
 
-
 var PostService = {};
 
 PostService.findCurrentState = function (callback) {
@@ -20,7 +19,7 @@ PostService.attemptSave = function (post, callback) {
     if (err) {
       callback(err);
     }
-    if(!err) {
+    if (!err) {
       PostService.pushPostState();
       callback(null, post);
     }
@@ -54,6 +53,7 @@ PostService.acceptPost = function (callback) {
       if (err) {
         return callback && callback('Unable to set state');
       } else {
+        console.log(' -- post accepted by', post.zivi.name);
         PostService.incrementPostCount(post, function (err, post) {
           if (err) {
             return callback && callback('Unable to credit Zivi');
@@ -81,6 +81,7 @@ PostService.dismissReminder = function (callback) {
     if (post.state !== STATES.REMINDER) {
       return callback && callback('Cannot dismiss reminder when not in reminder state, is: ' + post.state);
     } else {
+      console.log(' -- reminder dismissed by', post.zivi.name);
       PostService.setStateOn(post, STATES.IDLE, callback);
     }
   });
@@ -92,6 +93,7 @@ PostService.nextZivi = function (callback) {
       return callback && callback('Expected preparation state, but is: ' + post.state);
     }
     PostService.selectPostlerFairly(post, callback);
+    console.log(' -- selected for post:', post.zivi.name);
   });
 };
 
@@ -100,20 +102,20 @@ PostService.selectPostlerFairly = function (post, callback) {
     var fairArray = [];
     //Determine max post count of the zivis
     var maxPostCount = -1;
-    zivis.forEach(function(zivi){
-      if(zivi.post_count > maxPostCount){
+    zivis.forEach(function (zivi) {
+      if (zivi.post_count > maxPostCount) {
         maxPostCount = zivi.post_count;
       }
     });
     /*
-      Create an array that has maxPostCount - zivi.post_count + 1 elements
-      of each zivi. Which will basically represent a zivi with a lower post count
-      in a higher probability than a zivi with a higher post count
-      e.g: zivi1.post_count: 3, zivi2.post_count: 1, zivi3.post_count: 2
-      fairArray = [zivi1, zivi2, zivi2, zivi2, zivi3, zivi3]
+     Create an array that has maxPostCount - zivi.post_count + 1 elements
+     of each zivi. Which will basically represent a zivi with a lower post count
+     in a higher probability than a zivi with a higher post count
+     e.g: zivi1.post_count: 3, zivi2.post_count: 1, zivi3.post_count: 2
+     fairArray = [zivi1, zivi2, zivi2, zivi2, zivi3, zivi3]
      */
-    zivis.forEach(function(zivi){
-      for(var i = 0; i < maxPostCount - zivi.post_count + 1; i++){
+    zivis.forEach(function (zivi) {
+      for (var i = 0; i < maxPostCount - zivi.post_count + 1; i++) {
         fairArray.push(zivi);
       }
     });
