@@ -5,6 +5,8 @@ var SocketService = require('./socket.service');
 
 const FladeService = {};
 
+var errCounter = 0;
+
 FladeService.findFlade = function (callback) {
   FladeService.getCachedFlade(function (flade) {
     if (flade && !isThirtyMinutesOrMoreAgo(new Date(flade.timestamp))) {
@@ -24,6 +26,11 @@ function retrieveFlade(callback) {
     host: 'fladerei.com',
     path: '/dyn_inhalte/tagesflade.html'
   }, function (res) {
+    if (res.statusCode !== 200) {
+      errWithRateLimit('Failed to retrieve flade:', res);
+      res.resume();
+      return;
+    }
     var content = '';
     res.setEncoding('utf8');
     res.on('data', function (chunk) {
@@ -34,7 +41,19 @@ function retrieveFlade(callback) {
         updateCurrentFlade(result, callback);
       });
     });
+  }).on('error', function (err) {
+    errWithRateLimit('Failed to retrieve flade..', err);
   });
+}
+
+function errWithRateLimit(msg, err) {
+  errCounter++;
+  if (errCounter < 2) {
+    console.error(msg, err);
+  } else if (errCounter > 10) {
+    errCounter = 0;
+    console.error(msg, err, 'and 8 more...');
+  }
 }
 
 function parseContentToFlade(content, callback) {
