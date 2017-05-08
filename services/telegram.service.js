@@ -139,7 +139,7 @@ bot.onText(/\/volunteer/, function (msg) {
       if (post.state === STATES.ACTION) {
         return bot.sendMessage(msg.chat.id, 'Somebody else is currently doing the post, so idk what you\'re doing');
       }
-      if (post.zivi.chat === msg.chat.id) {
+      if (post.zivi.chat === msg.chat.id && post.state !== STATES.IDLE) {
         return bot.sendMessage(msg.chat.id, 'You are already the assigned Postler. El Señor will not repeat himself again.');
       }
       PostService.forcePostler(senderZivi, function () {
