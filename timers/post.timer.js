@@ -9,9 +9,9 @@ var TIME_FOR_ACTION;
 var TIME_FOR_REMINDER;
 var TIME_FOR_IDLE;
 
-PostService.findCurrentState(function (err, post) {
-  if (err) {
-    console.error('unable to find post:', err);
+PostService.findCurrentState(function (post) {
+  if (!post) {
+    console.error('unable to find post:', post);
   } else {
     console.info('current post:', post);
   }
@@ -60,8 +60,8 @@ function determineAction(date, post, expectedState) {
 
 var invokePreparationState = function () {
   return function () {
-    PostService.startPreparationState(function (err, post) {
-      post && post.zivi && TelegramService.sendPostlerPromptTo(post.zivi);
+    PostService.startPreparationState(function (post) {
+      TelegramService.sendPostlerPromptTo(post.zivi);
       return console.log(' -- PostTimer: Changed to preparation state.');
     });
   };
