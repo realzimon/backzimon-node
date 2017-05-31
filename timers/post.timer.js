@@ -9,6 +9,14 @@ var TIME_FOR_ACTION;
 var TIME_FOR_REMINDER;
 var TIME_FOR_IDLE;
 
+PostService.findCurrentState(function (err, post) {
+  if (err) {
+    console.error('unable to find post:', err);
+  } else {
+    console.info('current post:', post);
+  }
+});
+
 var PostTimer = {};
 
 PostTimer.checkAndNotify = function () {
@@ -53,7 +61,7 @@ function determineAction(date, post, expectedState) {
 var invokePreparationState = function () {
   return function () {
     PostService.startPreparationState(function (err, post) {
-      post.zivi && TelegramService.sendPostlerPromptTo(post.zivi);
+      post && post.zivi && TelegramService.sendPostlerPromptTo(post.zivi);
       return console.log(' -- PostTimer: Changed to preparation state.');
     });
   };
@@ -91,7 +99,7 @@ function determineActionForActionState(date, post) {
   if (isTimestampInFutureAndLogError(date, post) || stateStartedMoreThan15MinutesAgo) {
     return function () {
       PostService.startReminderState(function (err, post) {
-        if(!err){
+        if (!err) {
           TelegramService.sendYellowCardReminder(post.zivi);
         }
         return console.log(' -- PostTimer: Action state could possibly be done, but we don\'t  know, switching to reminder.');
