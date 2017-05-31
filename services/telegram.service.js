@@ -142,7 +142,7 @@ bot.onText(/\/volunteer/, function (msg) {
       if (post.zivi.chat === msg.chat.id && post.state !== STATES.IDLE) {
         return bot.sendMessage(msg.chat.id, 'You are already the assigned Postler. El Señor will not repeat himself again.');
       }
-      PostService.forcePostler(senderZivi, function (post) {
+      PostService.forcePostler(senderZivi, function (err, post) {
         bot.sendMessage(msg.chat.id, 'This is your life now');
         TelegramService.sendPostlerPromptTo(post.zivi);
       });
