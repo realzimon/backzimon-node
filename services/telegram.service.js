@@ -158,7 +158,7 @@ TelegramService.sendZiviUpdateToUser = function (zivi, message) {
 };
 
 TelegramService.sendPostlerPromptTo = function (zivi) {
-  if (!zivi.chat || zivi.chat === -1) {
+  if (!zivi || !zivi.chat || zivi.chat === -1) {
     return console.log(' ## No Telegram chat for', zivi.name);
   }
   bot.sendMessage(zivi.chat, 'Congratulations, you have been selected for the Honourable Task!\n' +
