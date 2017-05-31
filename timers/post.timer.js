@@ -9,13 +9,18 @@ var TIME_FOR_ACTION;
 var TIME_FOR_REMINDER;
 var TIME_FOR_IDLE;
 
-PostService.findCurrentState(function (post) {
-  if (!post) {
-    console.error('unable to find post:', post);
-  } else {
-    console.info('current post:', post);
-  }
-});
+if (!process.env.zimonTest) {
+  PostService.findCurrentState(function (post) {
+    if (!post) {
+      console.error('unable to find post:', post);
+    } else {
+      console.info('current post:', post);
+    }
+  });
+} else {
+  console.info('not checking post state because in tests.');
+}
+
 
 var PostTimer = {};
 
