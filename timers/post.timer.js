@@ -65,9 +65,13 @@ function determineAction(date, post, expectedState) {
 
 var invokePreparationState = function () {
   return function () {
-    PostService.startPreparationState(function (post) {
-      TelegramService.sendPostlerPromptTo(post.zivi);
-      return console.log(' -- PostTimer: Changed to preparation state.');
+    PostService.startPreparationState(function (err, post) {
+      if (err) {
+        console.error('unable to save post change', err);
+      } else {
+        TelegramService.sendPostlerPromptTo(post.zivi);
+        return console.log(' -- PostTimer: Changed to preparation state.');
+      }
     });
   };
 };
