@@ -37,7 +37,7 @@ PostTimer.checkWithTime = function (date, callback) {
     var expectedState = getStateForTime(date);
     var action = determineAction(date, post, expectedState);
     if (action) {
-      console.info(' -- PostTimer: Changing state from', post.state, 'to', expectedState, 'at', date);
+      console.info(' -- PostTimer: Changing state from', post.state, '(expected', expectedState + ') at', date);
       action();
     }
     callback && callback(post, action, expectedState);
@@ -111,7 +111,7 @@ function determineActionForActionState(date, post) {
         if (!err) {
           TelegramService.sendYellowCardReminder(post.zivi);
         }
-        return console.log(' -- PostTimer: Action state could possibly be done, but we don\'t  know, switching to reminder.');
+        return console.log(' -- PostTimer: Action state could possibly be done, but we don\'t know, switching to reminder.');
       });
     };
   }
