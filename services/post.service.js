@@ -118,7 +118,7 @@ PostService.selectPostlerFairly = function (post, callback) {
     });
     shuffle(fairArray);
     post.zivi = fairArray[0];
-    console.log(' -- PostService: Selected ', post.zivi.name);
+    console.log(' -- PostService: Selected', post.zivi.name);
     PostService.attemptSave(post, callback);
   });
 };
