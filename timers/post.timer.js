@@ -111,7 +111,7 @@ function determineActionForActionState(date, post) {
         if (!err) {
           TelegramService.sendYellowCardReminder(post.zivi);
         }
-        return console.log(' -- PostTimer: Action state could possibly be done, but we don\'t know, switching to reminder.');
+        return console.log(' -- PostTimer: Action state could possibly be done, but we don\'tr know, switching to reminder.');
       });
     };
   }
