@@ -52,4 +52,12 @@ ConfigService.getSocketPort = function () {
   return ConfigService.getOrDefault('socket-port', 4001);
 };
 
+ConfigService.getNetUsageHost = function () {
+  return ConfigService.getOrDefault('net-usage-host', '192.168.1.1');
+};
+
+ConfigService.getNetUsagePath = function () {
+  return ConfigService.getOrDefault('net-usage-path', '/usage/live.html');
+};
+
 module.exports = ConfigService;

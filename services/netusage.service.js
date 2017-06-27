@@ -1,31 +1,29 @@
+var ConfigService = require('./config.service');
 var http = require('http');
 var socket = require('./socket.service');
 
 const NetUsageService = {};
 
-var oldDate, oldValues = [];
+var prevUsages = {};
 
 var errCounter = 0;
 
-NetUsageService.loadAndPushNetUsage = function(){
-
-  loadWebsite(function(content){
-    matchWebSite(content);
+NetUsageService.loadAndPushNetUsage = function () {
+  retrieveUsageHTML(function (content) {
+    var totalUsages = NetUsageService.extractTotalUsagesFromHTML(content);
+    pushUsageDiffSinceLastPush(totalUsages);
   });
-
 };
 
-function pushToClient(data){
-  socket.writeToSocket('netusage', {
-    netUsage: data
-  });
-}
-
-function loadWebsite(cb){
+function retrieveUsageHTML(cb) {
+  if (process.env.zimonTest) {
+    console.error(' ### cannot retrieve net usage from remote from unit tests');
+    return;
+  }
   http.get({
-    host: '192.168.1.1',
-    path: '/usage/live.html'
-  }, function(res){
+    host: ConfigService.getNetUsageHost(),
+    path: ConfigService.getNetUsagePath()
+  }, function (res) {
     if (res.statusCode !== 200) {
       errWithRateLimit('Failed to retrieve net usage:', res);
       res.resume();
@@ -36,7 +34,7 @@ function loadWebsite(cb){
     res.on('data', function (chunk) {
       content += chunk;
     });
-    res.on('end', function(){
+    res.on('end', function () {
       return cb && cb(content);
     });
   }).on('error', function (err) {
@@ -54,115 +52,87 @@ function errWithRateLimit(msg, err) {
   }
 }
 
-function matchWebSite(content){
-  var re = /(var values = new Array[^;]*;)/, match = content.match(re);
-  if (!match) {
-    console.log('err');
-  } else {
-    // evaluate values
-    eval(match[1]);
-    //noinspection JSUnresolvedVariable
-    var v = values;
-    if (v) {
-      pushToClient(handleValues(v));
-      oldValues = v;
-      // set old date
-      oldDate = new Date();
-    }
+NetUsageService.extractTotalUsagesFromHTML = function (htmlDoc) {
+  var subArraysStr = NetUsageService.extractSubArraysStrFromHTML(htmlDoc);
+  if (!subArraysStr) {
+    console.error(' ### Unable to find top array for net usage');
+    return [];
   }
-}
+  return NetUsageService.extractTotalUsagesFromSubArrays(subArraysStr);
+};
 
-function getSize(size) {
-  var prefix = [' ', 'k', 'M', 'G', 'T', 'P', 'E', 'Z'];
-  var precision, base = 1000, pos = 0;
-  while (size > base) {
-    size /= base;
-    pos++;
-  }
-  if (pos > 2) precision = 1000; else precision = 1;
-  return (Math.round(size * precision) / precision) + ' ' + prefix[pos] + 'B';
-}
-function dateToString(date) {
-  return date.toString().substring(0, 24);
-}
-function getDateString(value) {
-  var tmp = value.split('_'),
-    str = tmp[0].split('-').reverse().join('-') + 'T' + tmp[1];
-  return dateToString(new Date(str));
-}
-function isArray(obj) {
-  return obj instanceof Array;
-}
+// we're matching one of two script tags that contains the network
+// usage data for all devices as an array of arrays,
+// first obtaining the top array - first group is list of sub arrays
 
-function handleValues(values) {
-  if (!isArray(values)) return '';
-  // find data
-  var data = [], totals = [0, 0, 0, 0, 0];
-  for (var i = 0; i < values.length; i++) {
-    var d = handleRow(values[i]);
-    if (d[1]) {
-      data.push(d);
-      // get totals
-      for (var j = 0; j < totals.length; j++) {
-        totals[j] += d[1][3 + j];
-      }
-    }
+const TOP_ARRAY_RE = /<script type="text\/javascript">\s+var values = new Array\(([^;]+)\);/;
+NetUsageService.extractSubArraysStrFromHTML = function (htmlDoc) {
+  var match = htmlDoc.match(TOP_ARRAY_RE);
+  return match ? match[1] : false;
+};
+
+// matches list of sub arrays in this format:
+//     new Array("DESKTOP-ANQ67MT","2c:41:38:9a:2f:3e","192.168.1.235",
+//     77967001.000000,1565928,79532929,"04-03-2017_10:31:11","05-03-2017_00:14:57"),
+// which are, in order, display name, MAC, Local IP,
+// total download (b), total upload (b), total down+up (b), first seen time, last seen time
+// match groups: display name, MAC, download (bits, trimmed to int)
+
+const SUB_ARRAY_RE = /new Array\("(.+?)","(.+?)",".+",\s+?(\d+).+\)/g;
+NetUsageService.extractTotalUsagesFromSubArrays = function (subArraysStr) {
+  var totalUsages = [];
+  var match;
+  while ((match = SUB_ARRAY_RE.exec(subArraysStr)) !== null) {
+    totalUsages.push({
+      hostname: match[1],
+      mac: match[2],
+      totalDownload: match[3]
+    });
   }
-  // sort data
-  data.sort(function (x, y) {
-    var a = x[1], b = y[1];
-    for (var i = 3; i <= 7; i++) {
-      if (a[i] < b[i]) return 1;
-      if (a[i] > b[i]) return -1;
-    }
-    return 0;
+  return totalUsages;
+};
+
+function pushUsageDiffSinceLastPush(totalUsages) {
+  NetUsageService.addUsageDiffComparedToInto(prevUsages, totalUsages);
+  storeAsPrevUsages(totalUsages);
+  socket.writeToSocket('netusage', {
+    usage: sortDescAndSanitise(totalUsages)
   });
-  var resultsToPush = [];
-  for (var k = 0; k < data.length; k++) {
-    if(k > 5){
-      break;
-    }
-    resultsToPush.push({
-      hostname: data[k][1][0],
-      download: data[k][1][3],
-      upload: data[k][1][4],
-      mac: data[k][1][1]
-    })
-  }
-
-  return resultsToPush;
 }
 
-function handleRow(data) {
-  // check if data is array
-  if (!isArray(data)) return [''];
-  // find old data
-  var oldData;
-  for (var i = 0; i < oldValues.length; i++) {
-    var cur = oldValues[i];
-    // compare mac addresses
-    if (oldValues[i][1] === data[1]) {
-      oldData = cur;
-      break;
+NetUsageService.addUsageDiffComparedToInto = function (prevUsagesObj, totalUsages) {
+  for (var i = 0; i < totalUsages.length; i++) {
+    var currentUsage = totalUsages[i];
+    if (!currentUsage || !currentUsage.mac) {
+      continue;
+    }
+    var prevUsage = prevUsagesObj[currentUsage.mac];
+    if (prevUsage && currentUsage.totalDownload && prevUsage <= currentUsage.totalDownload) {
+      currentUsage.recentDownload = currentUsage.totalDownload - prevUsage;
+    } else {
+      currentUsage.recentDownload = 0;
     }
   }
-  // find download and upload speeds
-  var dlSpeed = 0, upSpeed = 0;
-  if (oldData) {
-    var now = new Date(),
-      seconds = (now - oldDate) / 1000;
-    dlSpeed = (data[3] - oldData[3]) / seconds;
-    upSpeed = (data[4] - oldData[4]) / seconds;
-  }
-  // create rowData
-  var rowData = [];
-  for (var j = 0; j < data.length; j++) {
-    rowData.push(data[j]);
-    if (j === 2) {
-      rowData.push(dlSpeed, upSpeed);
+};
+
+function storeAsPrevUsages(totalUsages) {
+  prevUsages = {};
+  for (var i = 0; i < totalUsages.length; i++) {
+    var currentUsage = totalUsages[i];
+    if (currentUsage && currentUsage.mac && currentUsage.totalDownload) {
+      prevUsages[currentUsage.mac] = currentUsage.totalDownload;
     }
   }
-  return [null, rowData];
 }
+
+NetUsageService.sortDescAndSanitise = function (totalUsages) {
+  var cleanUsages = totalUsages.filter(function (usage) {
+    return usage && usage.recentDownload && usage.mac;
+  });
+  cleanUsages.sort(function (u1, u2) {
+    return u2.recentDownload - u1.recentDownload;
+  });
+  return cleanUsages;
+};
 
 module.exports = NetUsageService;
