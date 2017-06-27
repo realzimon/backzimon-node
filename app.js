@@ -17,8 +17,7 @@ var PostTimer = require('./timers/post.timer.js');
 var FladeService = require('./services/flade.service');
 
 const A_SECOND = 1000;
-const THIRTY_SECONDS = 30 * A_SECOND;
-setInterval(NetUsageService.loadAndPushNetUsage, THIRTY_SECONDS);
+setInterval(NetUsageService.loadAndPushNetUsage, NetUsageService.PUSH_INTERVAL_SECONDS * A_SECOND);
 const FIVE_SECONDS = 5 * A_SECOND;
 setInterval(PostTimer.checkAndNotify, FIVE_SECONDS);
 const TWO_HOURS = 2 * 60 * 60 * A_SECOND;

@@ -8,6 +8,8 @@ var prevUsages = {};
 
 var errCounter = 0;
 
+NetUsageService.PUSH_INTERVAL_SECONDS = 30;
+
 NetUsageService.loadAndPushNetUsage = function () {
   retrieveUsageHTML(function (content) {
     var totalUsages = NetUsageService.extractTotalUsagesFromHTML(content);
@@ -112,6 +114,7 @@ NetUsageService.addUsageDiffComparedToInto = function (prevUsagesObj, totalUsage
     } else {
       currentUsage.recentDownload = 0;
     }
+    currentUsage.recentDownloadRate = currentUsage.recentDownload / NetUsageService.PUSH_INTERVAL_SECONDS;
   }
 };
 
