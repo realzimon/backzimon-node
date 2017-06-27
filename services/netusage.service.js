@@ -13,7 +13,8 @@ var macToZiviCache = {};
 NetUsageService.loadAndPushNetUsage = function () {
   retrieveUsageHTML(function (content) {
     var totalUsages = NetUsageService.extractTotalUsagesFromHTML(content);
-    pushUsageDiffSinceLastPush(totalUsages);
+    var uniqueUsages = sumDuplicateUsages(totalUsages);
+    pushUsageDiffSinceLastPush(uniqueUsages);
   });
 };
 
@@ -88,11 +89,30 @@ NetUsageService.extractTotalUsagesFromSubArrays = function (subArraysStr) {
     totalUsages.push({
       hostname: match[1],
       mac: match[2],
-      totalDownload: match[3]
+      totalDownload: parseInt(match[3], 10)
     });
   }
   return totalUsages;
 };
+
+function sumDuplicateUsages(totalUsages) {
+  var uniqueUsages = [];
+  var macToFirstUsage = {};
+  for(var i = 0; i < totalUsages.length; i++) {
+    var usage = totalUsages[i];
+    if(!usage || !usage.mac) {
+      continue;
+    }
+    var existingUsage = macToFirstUsage[usage.mac];
+    if(existingUsage) {
+      existingUsage.totalDownload += usage.totalDownload;
+    } else {
+      macToFirstUsage[usage.mac] = usage;
+      uniqueUsages.push(usage);
+    }
+  }
+  return uniqueUsages;
+}
 
 function pushUsageDiffSinceLastPush(totalUsages) {
   NetUsageService.addUsageDiffComparedToInto(prevUsages, totalUsages);
