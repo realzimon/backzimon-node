@@ -96,7 +96,7 @@ function pushUsageDiffSinceLastPush(totalUsages) {
   NetUsageService.addUsageDiffComparedToInto(prevUsages, totalUsages);
   storeAsPrevUsages(totalUsages);
   socket.writeToSocket('netusage', {
-    usage: sortDescAndSanitise(totalUsages)
+    usage: NetUsageService.sortDescAndSanitise(totalUsages)
   });
 }
 
