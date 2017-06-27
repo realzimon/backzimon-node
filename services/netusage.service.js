@@ -1,14 +1,14 @@
 var ConfigService = require('./config.service');
+var ZiviService = require('../services/zivi.service');
 var http = require('http');
 var socket = require('./socket.service');
 
 const NetUsageService = {};
+NetUsageService.PUSH_INTERVAL_SECONDS = 30;
 
 var prevUsages = {};
-
 var errCounter = 0;
-
-NetUsageService.PUSH_INTERVAL_SECONDS = 30;
+var macToZiviCache = {};
 
 NetUsageService.loadAndPushNetUsage = function () {
   retrieveUsageHTML(function (content) {
@@ -97,8 +97,32 @@ NetUsageService.extractTotalUsagesFromSubArrays = function (subArraysStr) {
 function pushUsageDiffSinceLastPush(totalUsages) {
   NetUsageService.addUsageDiffComparedToInto(prevUsages, totalUsages);
   storeAsPrevUsages(totalUsages);
-  socket.writeToSocket('netusage', {
-    usage: NetUsageService.sortDescAndSanitise(totalUsages)
+  var cleanUsages = NetUsageService.sortDescAndSanitise(totalUsages);
+  findMacsToZivis(function (macsToZivis) {
+    populateUsagesWithZivisByMac(cleanUsages, macsToZivis);
+    socket.writeToSocket('netusage', {
+      usage: cleanUsages
+    });
+  });
+}
+
+function findMacsToZivis(callback) {
+  ZiviService.findAll(function (zivis) {
+    var macsToZivis = {};
+    zivis.forEach(function (zivi) {
+      if (zivi && zivi.addresses) {
+        zivi.addresses.forEach(function (address) {
+          macsToZivis[address] = zivi;
+        })
+      }
+    });
+    callback(macsToZivis);
+  });
+}
+
+function populateUsagesWithZivisByMac(totalUsages, macsToZivis) {
+  totalUsages.forEach(function (usage) {
+    usage.zivi = macsToZivis[usage.mac];
   });
 }
 
