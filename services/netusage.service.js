@@ -4,7 +4,7 @@ var http = require('http');
 var socket = require('./socket.service');
 
 const NetUsageService = {};
-NetUsageService.PUSH_INTERVAL_SECONDS = 30;
+NetUsageService.PUSH_INTERVAL_SECONDS = 15;
 
 var prevUsages = {};
 var errCounter = 0;
