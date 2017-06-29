@@ -8,9 +8,9 @@ const FladeService = {};
 var errCounter = 0;
 
 FladeService.findFlade = function (callback) {
-  FladeService.getCachedFlade(function (flade) {
+  FladeService.getCachedFlade(function (err, flade) {
     if (flade && !isThirtyMinutesOrMoreAgo(new Date(flade.timestamp))) {
-      callback && callback(flade);
+      callback && callback(err, flade);
     } else {
       retrieveFlade(callback)
     }
@@ -29,6 +29,7 @@ function retrieveFlade(callback) {
     if (res.statusCode !== 200) {
       errWithRateLimit('Failed to retrieve flade:', res);
       res.resume();
+      callback && callback(res.err);
       return;
     }
     var content = '';
@@ -43,6 +44,7 @@ function retrieveFlade(callback) {
     });
   }).on('error', function (err) {
     errWithRateLimit('Failed to retrieve flade..', err);
+    callback && callback(err);
   });
 }
 
@@ -90,8 +92,11 @@ function updateCurrentFlade(text, callback) {
       timestamp: new Date()
     });
     flade.save(function (err, flade) {
-      callback && callback(flade);
-      SocketService.writeToSocket('flade', flade);
+      callback && callback(err, flade);
+      SocketService.writeToSocket('flade',{
+        flade: flade,
+        error: err
+      });
     });
   });
 }
