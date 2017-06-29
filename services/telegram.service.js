@@ -70,11 +70,16 @@ bot.onText(/\/accept/, function (msg) {
       if (err) {
         return bot.sendMessage(msg.chat.id, err);
       } else {
-        PostService.acceptPost(function () {
-          bot.sendMessage(msg.chat.id, 'You have agreed to carry out the Honourable Task. Please note that this is ' +
-            'a legally binding agreement. Should you not carry out the Honourable Task, your second-born child belongs ' +
-            'to El Señor Chefzimon. Take care.');
-          PostService.pushPostState();
+        PostService.acceptPost(function (err, post) {
+          if (err) {
+            bot.sendMessage(msg.chat.id, 'Internal error accepting. Try again later.');
+            console.error('Failed to accept post', err);
+          } else {
+            bot.sendMessage(msg.chat.id, 'You have agreed to carry out the Honourable Task. Please note that this is ' +
+              'a legally binding agreement. Should you not carry out the Honourable Task, your second-born child belongs ' +
+              'to El Señor Chefzimon. Take care.');
+            PostService.pushPostState(post);
+          }
         });
       }
     });
@@ -89,7 +94,7 @@ bot.onText(/\/next/, function (msg) {
       } else {
         PostService.nextZivi(function (err, post) {
           bot.sendMessage(msg.chat.id, post.zivi.name + ' will carry out the Honourable Task.');
-          PostService.pushPostState();
+          PostService.pushPostState(post);
           TelegramService.sendPostlerPromptTo(post.zivi);
         });
       }
@@ -119,14 +124,14 @@ bot.onText(/\/cancel/, function (msg) {
 
 bot.onText(/\/dismiss/, function (msg) {
   checkAccountInitialisedOrFail(msg, function () {
-    PostService.findCurrentState(function(post){
-      if(post.state !== STATES.REMINDER){
+    PostService.findCurrentState(function (post) {
+      if (post.state !== STATES.REMINDER) {
         return bot.sendMessage(msg.chat.id, 'It\'s not time yet. Have a little patience.');
       }
-      if(post.zivi.chat !== msg.chat.id){
+      if (post.zivi.chat !== msg.chat.id) {
         return bot.sendMessage(msg.chat.id, 'El Señor Chefzimon has *not* asked you to return the yellow card. Please do not annoy him again.');
       }
-      PostService.dismissReminder(function(){
+      PostService.dismissReminder(function () {
         return bot.sendMessage(msg.chat.id, 'El Señor Chefzimon is not convinced yet. He is watching you.');
       });
     });
@@ -177,7 +182,7 @@ TelegramService.sendPostlerPromptTo = function (zivi) {
   });
 };
 
-TelegramService.sendYellowCardReminder = function(zivi){
+TelegramService.sendYellowCardReminder = function (zivi) {
   if (!zivi.chat || zivi.chat === -1) {
     return console.log(' ## No Telegram chat for', zivi.name);
   }

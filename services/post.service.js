@@ -18,9 +18,8 @@ PostService.attemptSave = function (post, callback) {
   post.save(function (err, post) {
     if (err) {
       callback(err);
-    }
-    if (!err) {
-      PostService.pushPostState();
+    }else {
+      PostService.pushPostState(post);
       callback(null, post);
     }
   });
@@ -147,9 +146,9 @@ PostService.startPreparationState = function (callback) {
   });
 };
 
-PostService.pushPostState = function () {
+PostService.pushPostState = function (post) {
   SocketService.writeToSocket('post', {
-    update: 'state'
+    post: post
   });
 };
 

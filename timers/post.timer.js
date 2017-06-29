@@ -187,6 +187,12 @@ function isWeekend(date) {
 }
 
 initTimes(new Date());
-PostService.pushPostState();
+PostService.findCurrentState(function (err, post) {
+  if(!err) {
+    PostService.pushPostState(post);
+  } else {
+    console.error('Unable to push post state', err);
+  }
+});
 
 module.exports = PostTimer;
