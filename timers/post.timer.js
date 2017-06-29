@@ -9,19 +9,6 @@ var TIME_FOR_ACTION;
 var TIME_FOR_REMINDER;
 var TIME_FOR_IDLE;
 
-if (!process.env.zimonTest) {
-  PostService.findCurrentState(function (post) {
-    if (!post) {
-      console.error('unable to find post:', post);
-    } else {
-      console.info('current post:', post);
-    }
-  });
-} else {
-  console.info('not checking post state because in tests.');
-}
-
-
 var PostTimer = {};
 
 PostTimer.checkAndNotify = function () {
@@ -187,12 +174,19 @@ function isWeekend(date) {
 }
 
 initTimes(new Date());
-PostService.findCurrentState(function (err, post) {
-  if(!err) {
-    PostService.pushPostState(post);
-  } else {
-    console.error('Unable to push post state', err);
-  }
-});
+
+
+if (!process.env.zimonTest) {
+  PostService.findCurrentState(function (post) {
+    if (!post) {
+      console.error('unable to find post:', post);
+    } else {
+      console.info('current post:', post);
+      PostService.pushPostState(post);
+    }
+  });
+} else {
+  console.info('not checking post state because in tests.');
+}
 
 module.exports = PostTimer;
