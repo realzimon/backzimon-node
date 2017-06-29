@@ -26,4 +26,14 @@ ZiviService.saveZivi = function(zivi, callback){
   zivi.save(callback);
 };
 
+ZiviService.deleteZivi = function (zivi, callback) {
+  models.DeletedZivi.create(zivi, function (err) {
+    if(err) {
+      callback && callback(err);
+    } else {
+      zivi.remove(callback);
+    }
+  })
+};
+
 module.exports = ZiviService;

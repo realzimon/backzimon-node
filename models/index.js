@@ -17,21 +17,28 @@ var Quote = mongoose.model('quote', mongoose.Schema({
   }
 }));
 
-var Zivi = mongoose.model('zivi', mongoose.Schema({
+const ziviSchema = {
   name: String,
   name_mx: String,
   post_count: {
     type: Number,
-    min: 0
+    min: 0,
+    default: 0
   },
   color: String,
   colorHex: String,
   picture: String,
-  first: Number,
+  first: {
+    type: Number,
+    min: 0,
+    default: 0
+  },
   order: Number,
   chat: Number,
   addresses: Array
-}));
+};
+var Zivi = mongoose.model('zivi', mongoose.Schema(ziviSchema));
+var DeletedZivi = mongoose.model('ripzivi', mongoose.Schema(ziviSchema));
 
 var Post = mongoose.model('post', mongoose.Schema({
   state: String,
@@ -47,6 +54,7 @@ var Flade = mongoose.model('flade', mongoose.Schema({
 var models = {
   Quote: Quote,
   Zivi: Zivi,
+  DeletedZivi: DeletedZivi,
   Post: Post,
   Flade: Flade
 };
