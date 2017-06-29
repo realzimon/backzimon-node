@@ -13,7 +13,20 @@ if (!apiKey || process.env.zimonTest) {
 
 var TelegramBot = require('node-telegram-bot-api');
 var bot = new TelegramBot(apiKey, {
-  polling: true
+  polling: true,
+  filepath: false
+});
+var errorCounter = 0;
+
+bot.on('polling_error', function(err) {
+  if(errorCounter < 5) {
+    console.error('Telegram polling failure', err.code, err.response && err.response.body);
+  } else if((errorCounter % 40) === 0) {
+    console.error('Telegram polling failure (... 9 more) - trace:', err.code, err.response && err.response.body);
+  } else if((errorCounter % 10) === 0) {
+    console.error('Telegram polling failure (... 9 more) - trace every 40 errors');
+  }
+  errorCounter++;
 });
 
 bot.onText(/\/start/, function (msg) {
