@@ -35,4 +35,19 @@ router.post('/delete', function (req, res) {
   });
 });
 
+router.post('/update', function (req, res) {
+  var name = req.body.name;
+  var spec = req.body.spec;
+  if(!name || typeof name !== "string" || !spec || typeof spec !== "object") {
+    return res.status(400).json({error: "body needs name (String) and spec (object) properties"});
+  }
+  ZiviService.updateZiviByName(name, spec, function (err, zivi) {
+    if(err) {
+      return res.status(500).json({error: err});
+    } else {
+      return res.status(200).json({zivi: zivi});
+    }
+  });
+});
+
 module.exports = router;
