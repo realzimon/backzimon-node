@@ -13,7 +13,7 @@ mongoose.connection = {
 
 var ZiviService = require('../services/zivi.service.js');
 sinon.stub(ZiviService, 'findAll', function (callback) {
-  callback && callback([{name: 'lel', post_count: 0}]);
+  callback && callback(null, [{name: 'lel', post_count: 0}]);
 });
 
 var PostService = require('../services/post.service.js');

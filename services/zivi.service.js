@@ -2,12 +2,16 @@ var models = require('../models/index');
 
 var ZiviService = {};
 
+ZiviService.findBy = function (conditions, callback) {
+  models.Zivi.find(conditions, callback);
+};
+
 ZiviService.findOneByName = function (name, callback) {
-  models.Zivi.findOne({name: name}).then(callback);
+  ZiviService.findBy({name: name}, callback);
 };
 
 ZiviService.findAll = function (callback) {
-  models.Zivi.find({}).then(callback);
+  ZiviService.findBy({}, callback);
 };
 
 ZiviService.findAllBut = function (ziviExcluded, callback) {
@@ -18,7 +22,7 @@ ZiviService.findAllBut = function (ziviExcluded, callback) {
       _id: {
         $ne: ziviExcluded._id
       }
-    }).then(callback);
+    }, callback);
   }
 };
 
@@ -41,9 +45,12 @@ ZiviService.createZivi = function (obj, callback) {
 };
 
 ZiviService.updateZiviByName = function (name, spec, callback) {
-  ZiviService.findOneByName(name, function (zivi) {
-    for(var propName in obj) {
-      if(obj.hasOwnProperty(propName) && propName !== '_id') {
+  ZiviService.findOneByName(name, function (err, zivi) {
+    if (err) {
+      return callback && callback(err);
+    }
+    for (var propName in obj) {
+      if (obj.hasOwnProperty(propName) && propName !== '_id') {
         zivi[propName] = obj[propName];
       }
     }

@@ -15,7 +15,10 @@ ZiviTimer.pushTimerData = function () {
 };
 
 ZiviTimer.shuffleZivisAndSaveOrder = function () {
-  ZiviService.findAll(function (zivis) {
+  ZiviService.findAll(function (err, zivis) {
+    if (err) {
+      return console.error('Failed to shuffle zivis', err);
+    }
     var ziviCount = zivis.length;
     var selectedZivis = [];
     for (var i = 0; i <= ziviCount; i++) {

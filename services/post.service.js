@@ -68,7 +68,10 @@ PostService.incrementPostCount = function (post, callback) {
   if (!post.zivi) {
     return;
   }
-  ZiviService.findOneByName(post.zivi.name, function (zivi) {
+  ZiviService.findOneByName(post.zivi.name, function (err, zivi) {
+    if(err) {
+      return callback && callback(err);
+    }
     zivi.post_count += 1;
     ZiviService.saveZivi(zivi, callback);
   });
@@ -94,7 +97,10 @@ PostService.nextZivi = function (callback) {
 };
 
 PostService.selectPostlerFairly = function (post, callback) {
-  ZiviService.findAllBut(post.zivi, function (zivis) {
+  ZiviService.findAllBut(post.zivi, function (err, zivis) {
+    if(err) {
+      return callback && callback(err);
+    }
     var fairArray = [];
     //Determine max post count of the zivis
     var maxPostCount = -1;

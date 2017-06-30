@@ -48,8 +48,8 @@ bot.onText(/\/help/, function (msg) {
 });
 
 bot.onText(/\/init (.+)/, function (msg, match) {
-  ZiviService.findOneByName(match[1], function (zivi) {
-    if (!zivi) {
+  ZiviService.findOneByName(match[1], function (err, zivi) {
+    if (err || !zivi) {
       return bot.sendMessage(msg.chat.id, 'Sorry, El Señor Chefzimon is not aware of anyone with this name. Note that ' +
         'the name is case-sensitive. Do not hack El Señor Chefzimon because he possesses great power beyond human imagination.');
     }
@@ -215,15 +215,9 @@ TelegramService.sendYellowCardReminder = function (zivi) {
 
 function checkAccountInitialisedOrFail(msg, callback) {
   var chatId = msg.chat.id;
-  ZiviService.findAll(function (zivis) {
-    var senderZivi = false;
-    zivis.forEach(function (zivi) {
-      if (zivi.chat === chatId) {
-        senderZivi = zivi;
-      }
-    });
-    if (senderZivi) {
-      callback(senderZivi);
+  ZiviService.findBy({chart: chatId}, function (err, zivi) {
+    if (!err && zivi) {
+      callback(zivi);
     } else {
       return bot.sendMessage(msg.chat.id, 'You have not yet registered with the El Señor Chefzimon Telegram Integration. ' +
         'Type /help for more information.');

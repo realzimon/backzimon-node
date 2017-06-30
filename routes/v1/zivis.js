@@ -24,7 +24,10 @@ router.post('/delete', function (req, res) {
   if(!name) {
     return res.status(400).json({error: "No name given"});
   }
-  var zivi = ZiviService.findOneByName(name, function (zivi) {
+  var zivi = ZiviService.findOneByName(name, function (err, zivi) {
+    if(err) {
+      return res.status(500).json({error: err});
+    }
     ZiviService.deleteZivi(zivi, function (err) {
       if(err) {
         return res.status(500).json({error: err});

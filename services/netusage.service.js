@@ -118,7 +118,10 @@ function pushUsageDiffSinceLastPush(totalUsages) {
   NetUsageService.addUsageDiffComparedToInto(prevUsages, totalUsages);
   storeAsPrevUsages(totalUsages);
   var cleanUsages = NetUsageService.sortDescAndSanitise(totalUsages);
-  findMacsToZivis(function (macsToZivis) {
+  findMacsToZivis(function (err, macsToZivis) {
+    if(err) {
+      return console.error('Error finding macs to zivis', err);
+    }
     populateUsagesWithZivisByMac(cleanUsages, macsToZivis);
     socket.writeToSocket('netusage', {
       usage: cleanUsages
@@ -127,7 +130,10 @@ function pushUsageDiffSinceLastPush(totalUsages) {
 }
 
 function findMacsToZivis(callback) {
-  ZiviService.findAll(function (zivis) {
+  ZiviService.findAll(function (err, zivis) {
+    if(err) {
+      return callback && callback(err);
+    }
     var macsToZivis = {};
     zivis.forEach(function (zivi) {
       if (zivi && zivi.addresses) {
@@ -136,7 +142,7 @@ function findMacsToZivis(callback) {
         })
       }
     });
-    callback(macsToZivis);
+    callback(null, macsToZivis);
   });
 }
 
