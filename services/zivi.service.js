@@ -51,9 +51,9 @@ ZiviService.updateZiviByName = function (name, spec, callback) {
     } else if (!zivi) {
       return callback && callback({code: 'ENOTFOUND', message: 'No zivi by that name: ' + name});
     }
-    for (var propName in obj) {
-      if (obj.hasOwnProperty(propName) && propName !== '_id') {
-        zivi[propName] = obj[propName];
+    for (var propName in spec) {
+      if (spec.hasOwnProperty(propName) && propName !== '_id') {
+        zivi[propName] = spec[propName];
       }
     }
     ZiviService.saveZivi(zivi, callback);
