@@ -48,6 +48,8 @@ ZiviService.updateZiviByName = function (name, spec, callback) {
   ZiviService.findOneByName(name, function (err, zivi) {
     if (err) {
       return callback && callback(err);
+    } else if (!zivi) {
+      return callback && callback({code: 'ENOTFOUND', message: 'No zivi by that name: ' + name});
     }
     for (var propName in obj) {
       if (obj.hasOwnProperty(propName) && propName !== '_id') {
