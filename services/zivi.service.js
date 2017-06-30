@@ -7,7 +7,7 @@ ZiviService.findBy = function (conditions, callback) {
 };
 
 ZiviService.findOneByName = function (name, callback) {
-  ZiviService.findBy({name: name}, callback);
+  models.Zivi.findOne({name: name}, callback);
 };
 
 ZiviService.findAll = function (callback) {
