@@ -63,11 +63,9 @@ var invokePreparationState = function () {
   };
 };
 function determineActionForIdleState(date, post, expectedState) {
-  switch (expectedState) {
-    case STATES.PREPARATION:
-    case STATES.ACTION:
+  if(expectedState === STATES.PREPARATION) {
       if (isTimestampInFutureAndLogError(date, post) ||
-        isFifteenMinutesOrMoreAgo(date, post.timestamp)) {
+        isNMinutesOrMoreAgo(date, post.timestamp, 20)) {
         return invokePreparationState();
       }
   }
@@ -91,25 +89,25 @@ function determineActionForPrepState(expectedState) {
 }
 
 function determineActionForActionState(date, post) {
-  var stateStartedMoreThan15MinutesAgo = isFifteenMinutesOrMoreAgo(date, post.timestamp);
+  var stateStartedMoreThan15MinutesAgo = isNMinutesOrMoreAgo(date, post.timestamp, 5);
   if (isTimestampInFutureAndLogError(date, post) || stateStartedMoreThan15MinutesAgo) {
     return function () {
       PostService.startReminderState(function (err, post) {
         if (!err) {
           TelegramService.sendYellowCardReminder(post.zivi);
         }
-        return console.log(' -- PostTimer: Action state could possibly be done, but we don\'tr know, switching to reminder.');
+        return console.log(' -- PostTimer: Action state could possibly be done, but we don\'t know, switching to reminder.');
       });
     };
   }
 }
 
-function isFifteenMinutesOrMoreAgo(now, date) {
-  return (now - date) >= 15 * 60 * 1000;
+function isNMinutesOrMoreAgo(now, date, mins) {
+  return (now - date) >= mins * 60 * 1000;
 }
 
 function determineActionForReminderState(date, post, expectedState) {
-  if (isFifteenMinutesOrMoreAgo(date, post.timestamp)) {
+  if (isNMinutesOrMoreAgo(date, post.timestamp, 15)) {
     switch (expectedState) {
       case STATES.PREPARATION:
       case STATES.ACTION:

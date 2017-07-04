@@ -62,6 +62,11 @@ describe('PostTimer', function () {
       const fourteenMinutesEarlier = new Date(timeToday - 14 * 60 * 1000);
       justCheckFromToExpected(10, 45, STATES.IDLE, STATES.IDLE, STATES.PREPARATION, fourteenMinutesEarlier);
     });
+    it('should not re-enter preparation state if last change is less than 15 minutes ago and is 11:00', function () {
+      const timeToday = PostTimer.hourMinuteDateToday(11, 0);
+      const fourteenMinutesEarlier = new Date(timeToday - 14 * 60 * 1000);
+      justCheckFromToExpected(11, 0, STATES.IDLE, STATES.IDLE, STATES.ACTION, fourteenMinutesEarlier);
+    });
     it('should have today\'s state thresholds even if the date is different from the day the timer was initialised at', function () {
       const timeToday = PostTimer.hourMinuteDateToday(14, 46);
       const timeYesterday = new Date(timeToday - 24 * 60 * 60 * 1000);
