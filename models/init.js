@@ -34,7 +34,6 @@ async.parallel({
           color: el.color,
           colorHex: el.colorHex,
           picture: el.picture,
-          first: 0,
           order: 0,
           chat: -1
         });

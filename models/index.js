@@ -28,11 +28,6 @@ const ziviSchema = {
   color: String,
   colorHex: String,
   picture: String,
-  first: {
-    type: Number,
-    min: 0,
-    default: 0
-  },
   order: Number,
   chat: Number,
   addresses: Array

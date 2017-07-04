@@ -1,9 +1,9 @@
-var shuffle = require('shuffle-array');
 var models = require('../models/index');
 var ZiviService = require('./../services/zivi.service.js');
 var SocketService = require('./../services/socket.service');
 
 var ZiviTimer = {};
+var previousFirst = false;
 const TIMER_SOCKET_NAME = 'timer';
 ZiviTimer.ZIVI_TIMER_INTERVAL = 600;
 ZiviTimer.remainingSeconds = ZiviTimer.ZIVI_TIMER_INTERVAL;
@@ -17,53 +17,44 @@ ZiviTimer.pushTimerData = function () {
 ZiviTimer.shuffleZivisAndSaveOrder = function () {
   ZiviService.findAll(function (err, zivis) {
     if (err) {
-      return console.error('Failed to shuffle zivis', err);
+      return console.error(' ## Failed to shuffle zivis', err);
+    } else if (!zivis || zivis.length === 0) {
+      return console.error(' ## No zivis to shuffle');
     }
-    var ziviCount = zivis.length;
-    var selectedZivis = [];
-    for (var i = 0; i <= ziviCount; i++) {
-      var zivi = selectZiviFairly(createFairArray(getMaxFirstZiviCount(zivis), zivis));
-      selectedZivis.push(zivi);
-      zivis = zivis.filter(function (element) {
-        return element._id !== zivi._id;
-      });
+    var shuffledZivis = shuffle(shuffle(zivis));
+    while (previousFirst && shuffledZivis[0].name === previousFirst.name) {
+      console.log(' --- Shuffling again because', previousFirst.name, 'was first last time too');
+      shuffledZivis = shuffle(zivis);
     }
-    if (selectedZivis.length > 0) {
-      selectedZivis[0].first += 1;
-      for (var j = 0; j < selectedZivis.length; j++) {
-        if (selectedZivis[j] === undefined) { // idk
-          continue;
-        }
-        selectedZivis[j].order = j + 1;
-        selectedZivis[j].save();
+    previousFirst = shuffledZivis[0];
+    for (var i = 0; i < shuffledZivis.length; i++) {
+      var zivi = shuffledZivis[i];
+      if (zivi) { // idk
+        zivi.order = i;
+        zivi.save();
       }
     }
   });
 };
 
-function getMaxFirstZiviCount(zivis) {
-  var max = -1;
-  zivis.forEach(function (zivi) {
-    if (zivi.first > max) {
-      max = zivi.first;
-    }
-  });
-  return max;
-}
+// Fisher-Yates Shuffle algorithm from https://stackoverflow.com/a/2450976/1117552
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
 
-function createFairArray(max, zivis) {
-  var fairArray = [];
-  zivis.forEach(function (zivi) {
-    for (var i = 0; i < max - zivi.first + 1; i++) {
-      fairArray.push(zivi);
-    }
-  });
-  return fairArray;
-}
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
 
-function selectZiviFairly(fairArray) {
-  shuffle(fairArray);
-  return fairArray[0];
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
 }
 
 function tickTimer() {
