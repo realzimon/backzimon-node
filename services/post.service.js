@@ -52,7 +52,7 @@ PostService.acceptPost = function (callback) {
       if (err) {
         return callback && callback('Unable to set state');
       } else {
-        PostService.incrementPostCount(post, function (err, post) {
+        PostService.incrementPostCount(post, function (err, zivi) {
           if (err) {
             return callback && callback('Unable to credit Zivi');
           } else {
