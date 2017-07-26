@@ -20,6 +20,8 @@ const A_SECOND = 1000;
 if (ConfigService.isNetUsageEnabled()) {
   var NetUsageService = require('./services/netusage.service');
   setInterval(NetUsageService.loadAndPushNetUsage, NetUsageService.PUSH_INTERVAL_SECONDS * A_SECOND);
+} else {
+  console.log('To enable polling and sending of network usage, set net-usage-host and -path in config/local-config.json.');
 }
 const FIVE_SECONDS = 5 * A_SECOND;
 setInterval(PostTimer.checkAndNotify, FIVE_SECONDS);
