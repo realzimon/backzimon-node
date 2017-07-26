@@ -3,6 +3,6 @@
   "mongo-url": "mongodb://127.0.0.1/zimon",
   "telegram-api-key": "",
   "socket-port": 4001,
-  "net-usage-host": "192.168.1.1",
-  "net-usage-path": "/usage/live.html"
+  "net-usage-host": "",
+  "net-usage-path": ""
 }

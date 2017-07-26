@@ -3,18 +3,18 @@ const CONFIG_DIRECTORY = './config/';
 const LOCAL_CONFIG_PATH = CONFIG_DIRECTORY + 'local-config.json';
 const EXAMPLE_CONFIG_PATH = CONFIG_DIRECTORY + 'example-config.json';
 
-if(!fs.existsSync(EXAMPLE_CONFIG_PATH)) {
+if (!fs.existsSync(EXAMPLE_CONFIG_PATH)) {
   console.error('Example config does not exist. Please restore it from git.');
   process.exit(1);
 }
 
 var configPath;
-if(process.env.zimonTest) {
+if (process.env.zimonTest) {
   configPath = EXAMPLE_CONFIG_PATH;
 } else {
-  if(!fs.existsSync(LOCAL_CONFIG_PATH)) {
+  if (!fs.existsSync(LOCAL_CONFIG_PATH)) {
     console.error('Local config file does not exist!');
-    console.error('Please copy ',EXAMPLE_CONFIG_PATH, 'to', LOCAL_CONFIG_PATH, 'and configure the application!');
+    console.error('Please copy ', EXAMPLE_CONFIG_PATH, 'to', LOCAL_CONFIG_PATH, 'and configure the application!');
     process.exit(1);
   }
   configPath = LOCAL_CONFIG_PATH;
@@ -24,7 +24,7 @@ var localConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 var ConfigService = {};
 
 ConfigService.getUnchecked = function (propertyName) {
-  if(localConfig.hasOwnProperty(propertyName)) {
+  if (localConfig.hasOwnProperty(propertyName)) {
     return localConfig[propertyName];
   } else {
     return undefined;
@@ -33,7 +33,7 @@ ConfigService.getUnchecked = function (propertyName) {
 
 ConfigService.getOrDefault = function (propertyName, def) {
   var value = ConfigService.getUnchecked(propertyName);
-  if(value === undefined) {
+  if (value === undefined) {
     return def;
   } else {
     return value;
@@ -53,11 +53,15 @@ ConfigService.getSocketPort = function () {
 };
 
 ConfigService.getNetUsageHost = function () {
-  return ConfigService.getOrDefault('net-usage-host', '192.168.1.1');
+  return ConfigService.getOrDefault('net-usage-host', '');
 };
 
 ConfigService.getNetUsagePath = function () {
-  return ConfigService.getOrDefault('net-usage-path', '/usage/live.html');
+  return ConfigService.getOrDefault('net-usage-path', '');
+};
+
+ConfigService.isNetUsageEnabled = function () {
+  return ConfigService.getNetUsageHost() && ConfigService.getNetUsagePath();
 };
 
 module.exports = ConfigService;
