@@ -32,9 +32,10 @@ ZiviService.saveZivi = function (zivi, callback) {
 
 ZiviService.deleteZivi = function (zivi, callback) {
   var ripZivi = {};
-  for (var propName in zivi) {
-    if (zivi.hasOwnProperty(propName) && propName !== '_id' && propName !== 'id' && propName !== '__v') {
-      ripZivi[propName] = zivi[propName];
+  console.log(' ### Deleting Zivi:', zivi);
+  for (var propName in zivi._doc) {
+    if (zivi._doc.hasOwnProperty(propName) && propName !== '_id' && propName !== '__v') {
+      ripZivi[propName] = zivi._doc[propName];
     }
   }
   models.DeletedZivi.create(ripZivi, function (err) {
