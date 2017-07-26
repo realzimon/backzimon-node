@@ -13,6 +13,16 @@ router.get('/', function (req, res) {
   });
 });
 
+router.get('/rip', function (req, res) {
+  models.DeletedZivi.find({}).exec(function (err, response) {
+    return res.json({
+      ripcount: response.length,
+      ripzivis: response,
+      condolences: 'Rest in Peace. El Señor misses you all.'
+    });
+  });
+});
+
 router.get('/random', function (req, res) {
   models.Zivi.find({}).then(function (response) {
     return res.json(response[Math.floor(Math.random() * response.length)])
