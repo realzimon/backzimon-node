@@ -75,7 +75,30 @@ router.post('/update', function (req, res) {
       }
     });
   });
+});
 
+router.post('/delete', function (req, res) {
+  var text = req.body && req.body.text;
+  if (!text) {
+    return res.status(400).json({
+      err: 'Need a text to match with.'
+    })
+  }
+  models.Quote.findOne({text: text}, function (err, quote) {
+    if (err || !quote) {
+      return res.status(500).json({
+        err: err || 'unknown error'
+      })
+    }
+    console.log(' --- deleting quote "' + text + '"');
+    quote.remove(function (err, deletedQuote) {
+      if (err) {
+        return res.status(500).json({err: err});
+      } else {
+        return res.status(200).json({deletedQuote: deletedQuote});
+      }
+    });
+  });
 });
 
 module.exports = router;
