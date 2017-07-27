@@ -17,34 +17,35 @@ router.get('/random', function (req, res) {
   });
 });
 
-router.post('/', function (req, res) {
+router.post('/create', function (req, res) {
   var text = req.body.text;
   if (!text) {
     return res.status(400).json({
       err: 'No text given'
     })
   }
-  models.Quote.findOne({text: text}, function (err, result) {
+  models.Quote.findOne({text: text}, function (err, existingQuote) {
     if (err) {
       return res.status(500).json({
         err: err
       })
     }
-    if (result) {
-      return res.status(200).json();
+    if (existingQuote) {
+      return res.status(200).json({quote: existingQuote});
     }
-    var quote = new models.Quote({
+    var newQuote = new models.Quote({
       text: text,
       count: 0
     });
 
-    quote.save(function (err) {
+    newQuote.save(function (err) {
       if (err) {
         return res.status(500).json({
           err: err
         })
+      } else {
+        return res.status(201).json({quote: newQuote});
       }
-      return res.status(201).json();
     });
   });
 
@@ -70,7 +71,7 @@ router.post('/update', function (req, res) {
       if (err) {
         return res.status(500).json({err: err});
       } else {
-        return res.status(200).json({newText: savedQuote.text});
+        return res.status(200).json({quote: savedQuote});
       }
     });
   });
