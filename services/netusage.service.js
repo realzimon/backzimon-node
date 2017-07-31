@@ -23,6 +23,16 @@ function retrieveUsageHTML(cb) {
     console.error(' ### cannot retrieve net usage from remote from unit tests');
     return;
   }
+  var d = require('domain').create();
+  d.on('error', function (err) {
+    errWithRateLimit('Failed to retrieve net usage - top level error:', err);
+  });
+  d.run(function () {
+    doRetrieveNetUsageHTML(cb);
+  })
+}
+
+function doRetrieveNetUsageHTML(cb) {
   http.get({
     host: ConfigService.getNetUsageHost(),
     path: ConfigService.getNetUsagePath()
