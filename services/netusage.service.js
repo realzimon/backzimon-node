@@ -25,7 +25,7 @@ function retrieveUsageHTML(cb) {
   }
   var d = require('domain').create();
   d.on('error', function (err) {
-    errWithRateLimit('Failed to retrieve net usage - top level error:', err);
+    errWithRateLimit('Failed to retrieve net usage - top level error:', err.code);
   });
   d.run(function () {
     doRetrieveNetUsageHTML(cb);
