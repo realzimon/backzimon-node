@@ -40,6 +40,9 @@ function retrieveUsageHTML(cb) {
     res.on('end', function () {
       return cb && cb(content);
     });
+    res.on('error', function (err) {
+      errWithRateLimit('Failed to retrieve net usage...', err);
+    })
   }).on('error', function (err) {
     errWithRateLimit('Failed to retrieve net usage..', err);
   });
