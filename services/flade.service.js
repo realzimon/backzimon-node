@@ -65,7 +65,7 @@ function parseContentToFlade(content, callback) {
     onopentag: function (name, attribs) {
       if (name === 'a' && attribs.href.indexOf('berggasse') !== -1) {
         berggasse = true;
-      } else if (name === 'span' && berggasse) {
+      } else if (name === 'td' && berggasse) {
         tagesflade = true;
       }
     },
@@ -75,7 +75,7 @@ function parseContentToFlade(content, callback) {
       }
     },
     onclosetag: function (tagname) {
-      if (tagname === 'span' && berggasse && tagesflade) {
+      if (tagname === 'td' && berggasse && tagesflade) {
         berggasse = tagesflade = false;
       }
     }
